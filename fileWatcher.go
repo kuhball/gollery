@@ -13,7 +13,7 @@ import (
 )
 
 const thumbSize = 384
-const featSize = 514
+const featSize = 771
 const prevSize = 1080
 
 var recreateZip = false
@@ -114,8 +114,6 @@ func checkFiles(files []os.FileInfo, subSite string, featured bool) {
 }
 
 func addZip(output string, path []string) {
-	log.Println(output)
-	log.Println(path)
 	err := archiver.Zip.Make(output, path)
 	if err != nil {
 		log.Fatal(err)
