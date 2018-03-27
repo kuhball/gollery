@@ -12,8 +12,8 @@ import (
 	"strings"
 )
 
-const thumbSize = 384
-const featSize = 771
+const thumbSize = 396
+const featSize = 796
 const prevSize = 1080
 
 var recreateZip = false
@@ -97,17 +97,17 @@ func checkFiles(files []os.FileInfo, subSite string, featured bool) {
 	for _, file := range files {
 		if _, err := os.Stat(galleryPath + subSite + thumbImgDir + "thumb" + file.Name()); os.IsNotExist(err) {
 			if featured {
-				createImage(galleryPath+subSite+featImgDir+file.Name(), galleryPath+subSite+thumbImgDir+"thumb"+file.Name(), featSize)
+				go createImage(galleryPath+subSite+featImgDir+file.Name(), galleryPath+subSite+thumbImgDir+"thumb"+file.Name(), featSize)
 			} else {
-				createImage(galleryPath+subSite+origImgDir+file.Name(), galleryPath+subSite+thumbImgDir+"thumb"+file.Name(), thumbSize)
+				go createImage(galleryPath+subSite+origImgDir+file.Name(), galleryPath+subSite+thumbImgDir+"thumb"+file.Name(), thumbSize)
 			}
 		}
 		if _, err := os.Stat(galleryPath + subSite + prevImgDir + "prev" + file.Name()); os.IsNotExist(err) {
 			if featured {
-				createImage(galleryPath+subSite+featImgDir+file.Name(), galleryPath+subSite+prevImgDir+"prev"+file.Name(), prevSize)
+				go createImage(galleryPath+subSite+featImgDir+file.Name(), galleryPath+subSite+prevImgDir+"prev"+file.Name(), prevSize)
 
 			} else {
-				createImage(galleryPath+subSite+origImgDir+file.Name(), galleryPath+subSite+prevImgDir+"prev"+file.Name(), prevSize)
+				go createImage(galleryPath+subSite+origImgDir+file.Name(), galleryPath+subSite+prevImgDir+"prev"+file.Name(), prevSize)
 			}
 		}
 	}

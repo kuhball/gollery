@@ -12,7 +12,6 @@
 
     <title>{{.Title}}</title>
 
-
 </head>
 
 <body>
@@ -24,6 +23,8 @@
                 <h1 class="page-header">{{.Title}}</h1>
                 <h6 class="page-describtion">{{.Description}}</h6>
                 {{ if .Download }}<a class="button button-primary" href="/{{ .GalleryPath }}{{ .Title }}/{{ .Title }}_images.zip">Download</a>{{ end }}
+                <hr>
+
             </div>
 
         {{ $prevDir     :=      .PrevImgDir}}
@@ -47,7 +48,7 @@
         <hr>
         <footer>
             <div class="row">
-                <div class="six columns">
+                <div class="footer">
                     <h6>Copyright &copy; Simon Couball</h6>
                 </div>
             </div>

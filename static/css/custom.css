@@ -5,7 +5,7 @@
 }
 
 .grid-sizer, .grid-item {
-    width: 32%;
+    width: 33%;
 }
 
 .grid-item {
@@ -18,7 +18,7 @@
     display: block;
     max-width: 100%;
     min-width: 100%;
-    max-height: 516px;
+    max-height: 532px;
     object-fit: cover;
 }
 
@@ -47,24 +47,19 @@
 }
 
 .feature {
-    width: 64.25%;
+    width: 66.25%;
 }
 
 .feature img {
     min-width: 100%;
-    min-height: 516px;
+    min-height: 532px;
     object-fit: cover;
-    max-height: none;
+    max-height: 1068px;
 }
 
 .container {
     width: 95% !important;
 }
-
-.button {
-    border:1px solid #000 !important;
-}
-
 .button-primary {
     background-color: #000 !important;
     border-color: #000 !important;
@@ -84,6 +79,10 @@
     border: 1px solid #555;
 }
 
+.footer {
+    text-align: center;
+}
+
 @media screen and (max-width: 450px) {
     .grid-sizer, .grid-item {
         width: 48%;
@@ -95,5 +94,9 @@
 
     .feature {
         width: 96.7%;
+    }
+
+    .feature img {
+        min-height: 0;
     }
 }
