@@ -1,0 +1,98 @@
+.grid:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+.grid-sizer, .grid-item {
+    width: 32%;
+}
+
+.grid-item {
+    float: left;
+    margin-bottom: 4px;
+    text-align: center;
+}
+
+.grid-item img {
+    display: block;
+    max-width: 100%;
+    min-width: 100%;
+    max-height: 516px;
+    object-fit: cover;
+}
+
+.container {
+    top: 1em;
+    max-width: 1200px !important;
+}
+
+.meta {
+    width: 32%;
+    float: left;
+}
+
+.grid:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+.grid-item--width2 {
+    width: 64.25%;
+}
+
+.grid-item--full-width {
+    width: 100%;
+}
+
+.feature {
+    width: 64.25%;
+}
+
+.feature img {
+    min-width: 100%;
+    min-height: 516px;
+    object-fit: cover;
+}
+
+.container {
+    width: 95% !important;
+}
+
+.button {
+    border:1px solid #000 !important;
+}
+
+.button-primary {
+    background-color: #000 !important;
+    border-color: #000 !important;
+}
+
+.chocolat-wrapper .chocolat-description {
+    color: white;
+    border: 1px solid white;
+    height: 34px;
+    margin-top: 3px;
+    line-height: 32px;
+    padding: 0 14px;
+}
+
+.chocolat-wrapper .chocolat-description:hover {
+    color: #555;
+    border: 1px solid #555;
+}
+
+@media screen and (max-width: 450px) {
+    .grid-sizer, .grid-item {
+        width: 48%;
+    }
+
+    .grid-item--width2 {
+        width: 96.7%;
+    }
+
+    .feature {
+        width: 96.7%;
+    }
+}
