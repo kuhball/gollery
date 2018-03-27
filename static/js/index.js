@@ -1,4 +1,4 @@
-var $grid = $('.grid').imagesLoaded( function() {
+var $grid = $('.grid').imagesLoaded(function () {
     $grid.masonry({
         itemSelector: '.grid-item',
         percentPosition: true,
@@ -7,14 +7,14 @@ var $grid = $('.grid').imagesLoaded( function() {
     });
 });
 
-$(document).ready(function(){
+$(document).ready(function () {
     $('.grid').Chocolat({
         displayAsALink: true,
-        linkImages : true,
+        linkImages: true,
         imageSize: 'contain',
         enableZoom: true
     });
-    $('a').hover(function(){
+    $('a').hover(function () {
         $(this).attr('title', '');
     });
 });

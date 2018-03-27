@@ -12,10 +12,6 @@ import (
 	"strings"
 )
 
-const thumbSize = 396
-const featSize = 796
-const prevSize = 1080
-
 var recreateZip = false
 
 func watchFile(subSites [] string) {

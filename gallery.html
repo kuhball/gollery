@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,17 +9,15 @@
     <meta name="author" content="Simon Couball">
     <meta name="theme-color" content="#000"/>
     <title>{{.Title}}</title>
-
 </head>
-
 <body>
 <div class="container">
     <div class="row">
         <div class="grid">
             <div class="grid-sizer"></div>
             <div class="grid-item meta">
-                <h1 class="page-header">{{.Title}}</h1>
-                <h6 class="page-describtion">{{.Description}}</h6>
+                <h1>{{.Title}}</h1>
+                <h6>{{.Description}}</h6>
             {{ if .Download }}
                 <a class="button button-primary"
                    href="/{{ .GalleryPath }}{{ .Title }}/{{ .Title }}_images.zip">Download</a>
@@ -68,7 +65,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chocolat/0.4.19/css/chocolat.min.css">
-<link rel="stylesheet" href="/static/css/custom.css" >
+<link rel="stylesheet" href="/static/css/custom.css">
 </body>
 
 </html>

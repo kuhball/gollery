@@ -18,6 +18,10 @@ const thumbImgDir = "thumbnail/"
 const galleryPath = "static/gallery/"
 const configPath = "config/"
 
+const thumbSize = 396
+const featSize = 796
+const prevSize = 1080
+
 var subSites []string
 
 type Page struct {
@@ -126,12 +130,10 @@ func initWebServer(port string) {
 }
 
 func main() {
-	go initWebServer("8080")
-	initSubSites()
-	checkSubSites(subSites)
-
-	watchFile(subSites)
-	//subSite := "ungarn/"
-	//folders := []string{galleryPath + subSite + origImgDir,galleryPath + subSite +featImgDir}
-	//addZip(galleryPath+subSite+strings.Replace(subSite,"/","",1)+"_images.zip", folders)
+	//go initWebServer("8080")
+	//initSubSites()
+	//checkSubSites(subSites)
+	//
+	//watchFile(subSites)
+	cliAccess()
 }
