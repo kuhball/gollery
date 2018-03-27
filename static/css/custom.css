@@ -23,7 +23,7 @@
 }
 
 .container {
-    top: 1em;
+    top: 3em;
     max-width: 1200px !important;
 }
 
@@ -64,19 +64,13 @@
     background-color: #000 !important;
     border-color: #000 !important;
 }
-
-.chocolat-wrapper .chocolat-description {
-    color: white;
-    border: 1px solid white;
+.chocolat-button {
+    color: #fff;
+    border: 1px solid #fff;
     height: 34px;
     margin-top: 3px;
     line-height: 32px;
     padding: 0 14px;
-}
-
-.chocolat-wrapper .chocolat-description:hover {
-    color: #555;
-    border: 1px solid #555;
 }
 
 .footer {

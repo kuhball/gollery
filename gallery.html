@@ -22,7 +22,8 @@
             <div class="grid-item meta grid-item--full-width">
                 <h1 class="page-header">{{.Title}}</h1>
                 <h6 class="page-describtion">{{.Description}}</h6>
-                {{ if .Download }}<a class="button button-primary" href="/{{ .GalleryPath }}{{ .Title }}/{{ .Title }}_images.zip">Download</a>{{ end }}
+            {{ if .Download }}<a class="button button-primary"
+                                 href="/{{ .GalleryPath }}{{ .Title }}/{{ .Title }}_images.zip">Download</a>{{ end }}
                 <hr>
 
             </div>
@@ -36,9 +37,9 @@
 
         {{ range $image,$feature := .Images }}
             <div class='grid-item {{ if $feature }}feature{{end}}'>
-                <a class='chocolat-image' title='Download'
-                   href='/{{ $gallDir }}{{ $title }}/{{ $prevDir }}prev{{ $image }}'
-                   download_href='/{{ $gallDir }}{{ $title }}/{{ if $feature }}{{ $featDir }}{{ else }}{{ $origDir }}{{ end }}{{ $image }}'>
+                <a class='chocolat-image'
+                   title='<a class="button chocolat-button" href="/{{ $gallDir }}{{ $title }}/{{ if $feature }}{{ $featDir }}{{ else }}{{ $origDir }}{{ end }}{{ $image }}" download>DOWNLOAD</a>'
+                   href='/{{ $gallDir }}{{ $title }}/{{ $prevDir }}prev{{ $image }}'>
                     <img src='/{{ $gallDir }}{{ $title }}/{{ $thumbDir }}thumb{{ $image }}'/>
                 </a>
             </div>
@@ -56,14 +57,16 @@
 
     </div>
 </div>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-<script type="text/javascript" src="/static/js/jquery.chocolat.js"></script>
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"
+        integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chocolat/0.4.19/js/jquery.chocolat.js"></script>
 <script src='https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js'></script>
 <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chocolat/0.4.19/css/chocolat.min.css">
 <link href="/static/css/custom.css" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/chocolat.css" type="text/css" media="screen" charset="utf-8">
 <script src="/static/js/index.js"></script>
 </body>
 

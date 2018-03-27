@@ -14,7 +14,8 @@ $(document).ready(function(){
     $('.grid').Chocolat({
         displayAsALink: true,
         linkImages : true,
-        imageSize: 'contain'
+        imageSize: 'contain',
+        enableZoom: true
     });
 });
 
