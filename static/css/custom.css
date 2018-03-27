@@ -18,7 +18,7 @@
     display: block;
     max-width: 100%;
     min-width: 100%;
-    max-height: 532px;
+    max-height: 522px;
     object-fit: cover;
 }
 
@@ -52,9 +52,9 @@
 
 .feature img {
     min-width: 100%;
-    min-height: 532px;
+    min-height: 522px;
     object-fit: cover;
-    max-height: 1068px;
+    max-height: 1048px;
 }
 
 .container {

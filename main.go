@@ -119,18 +119,18 @@ func initWebServer(port string) {
 	http.HandleFunc("/static/", staticHandler)
 
 	for _, file := range readDir(configPath) {
-		http.HandleFunc("/"+strings.Replace(file.Name(), ".yaml", "", 1)+"/", galleryHandler)
+		http.HandleFunc("/"+strings.Replace(file.Name(), ".yaml", "", 1), galleryHandler)
 	}
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
 func main() {
+	go initWebServer("8080")
 	initSubSites()
 	checkSubSites(subSites)
 
-	go watchFile(subSites)
-	initWebServer("8080")
+	watchFile(subSites)
 	//subSite := "ungarn/"
 	//folders := []string{galleryPath + subSite + origImgDir,galleryPath + subSite +featImgDir}
 	//addZip(galleryPath+subSite+strings.Replace(subSite,"/","",1)+"_images.zip", folders)

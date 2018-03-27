@@ -6,7 +6,7 @@ var $grid = $('.grid').imagesLoaded( function() {
         itemSelector: '.grid-item',
         percentPosition: true,
         columnWidth: '.grid-sizer',
-        gutter: 3
+        gutter: 4
     });
 });
 
@@ -16,6 +16,9 @@ $(document).ready(function(){
         linkImages : true,
         imageSize: 'contain',
         enableZoom: true
+    });
+    $('a').hover(function(){
+        $(this).attr('title', '');
     });
 });
 

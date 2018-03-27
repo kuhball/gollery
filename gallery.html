@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="/static/images/favicon.png">
-    <meta name="description" content="">
+    <meta name="description" content="{{.Description}}">
     <meta name="author" content="Simon Couball">
     <meta name="theme-color" content="#000"/>
-
     <title>{{.Title}}</title>
 
 </head>
@@ -22,8 +21,10 @@
             <div class="grid-item meta grid-item--full-width">
                 <h1 class="page-header">{{.Title}}</h1>
                 <h6 class="page-describtion">{{.Description}}</h6>
-            {{ if .Download }}<a class="button button-primary"
-                                 href="/{{ .GalleryPath }}{{ .Title }}/{{ .Title }}_images.zip">Download</a>{{ end }}
+            {{ if .Download }}
+                <a class="button button-primary"
+                   href="/{{ .GalleryPath }}{{ .Title }}/{{ .Title }}_images.zip">Download</a>
+            {{ end }}
                 <hr>
 
             </div>
@@ -40,7 +41,7 @@
                 <a class='chocolat-image'
                    title='<a class="button chocolat-button" href="/{{ $gallDir }}{{ $title }}/{{ if $feature }}{{ $featDir }}{{ else }}{{ $origDir }}{{ end }}{{ $image }}" download>DOWNLOAD</a>'
                    href='/{{ $gallDir }}{{ $title }}/{{ $prevDir }}prev{{ $image }}'>
-                    <img src='/{{ $gallDir }}{{ $title }}/{{ $thumbDir }}thumb{{ $image }}'/>
+                    <img alt="{{ $title }}" src='/{{ $gallDir }}{{ $title }}/{{ $thumbDir }}thumb{{ $image }}'/>
                 </a>
             </div>
         {{ end }}
@@ -54,20 +55,20 @@
                 </div>
             </div>
         </footer>
-
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"
         integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
         crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chocolat/0.4.19/js/jquery.chocolat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chocolat/0.4.19/js/jquery.chocolat.min.js"></script>
 <script src='https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js'></script>
 <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chocolat/0.4.19/css/chocolat.min.css">
-<link href="/static/css/custom.css" rel="stylesheet">
 <script src="/static/js/index.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chocolat/0.4.19/css/chocolat.min.css">
+<link rel="stylesheet" href="/static/css/custom.css" >
 </body>
 
 </html>
