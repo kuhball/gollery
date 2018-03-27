@@ -1,0 +1,15 @@
+---
+port: 8080
+galleries:
+    ungarn:
+      title: Ungarn
+      description: "Schön ists hier."
+      download: true
+    silvester:
+      title: Silvester
+      description: "Schön wars."
+      download: false
+    test:
+      title: test
+      description: "Schön wars."
+      download: true

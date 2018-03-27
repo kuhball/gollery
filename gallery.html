@@ -20,25 +20,18 @@
                 <h6>{{.Description}}</h6>
             {{ if .Download }}
                 <a class="button button-primary"
-                   href="/{{ .GalleryPath }}{{ .Title }}/{{ .Title }}_images.zip">Download</a>
+                   href="/{{ .Dir.GalleryPath }}{{ .Title }}/{{ .Title }}_images.zip">Download</a>
             {{ end }}
                 <hr>
-
             </div>
-
-        {{ $prevDir     :=      .PrevImgDir}}
-        {{ $thumbDir    :=      .ThumbImgDir}}
-        {{ $origDir     :=      .OrigImgDir}}
-        {{ $gallDir     :=      .GalleryPath }}
-        {{ $title       :=      .Title}}
-        {{ $featDir     :=      .FeatImgDir}}
 
         {{ range $image,$feature := .Images }}
             <div class='grid-item {{ if $feature }}feature{{end}}'>
                 <a class='chocolat-image'
-                   title='<a class="button chocolat-button" href="/{{ $gallDir }}{{ $title }}/{{ if $feature }}{{ $featDir }}{{ else }}{{ $origDir }}{{ end }}{{ $image }}" download>DOWNLOAD</a>'
-                   href='/{{ $gallDir }}{{ $title }}/{{ $prevDir }}prev{{ $image }}'>
-                    <img alt="{{ $title }}" src='/{{ $gallDir }}{{ $title }}/{{ $thumbDir }}thumb{{ $image }}'/>
+                   title='<a class="button chocolat-button" href="/{{ $.Dir.GalleryPath }}{{ $.Title }}/{{ if $feature }}{{ $.Dir.FeatImgDir }}{{ else }}{{ $.Dir.OrigImgDir }}{{ end }}{{ $image }}" download>DOWNLOAD</a>'
+                   href='/{{ $.Dir.GalleryPath }}{{ $.Title }}/{{ $.Dir.PrevImgDir }}prev{{ $image }}'>
+                    <img alt="{{ $.Title }}"
+                         src='/{{ $.Dir.GalleryPath }}{{ $.Title }}/{{ $.Dir.ThumbImgDir }}thumb{{ $image }}'/>
                 </a>
             </div>
         {{ end }}

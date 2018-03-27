@@ -12,9 +12,9 @@ import (
 	"strings"
 )
 
-var recreateZip = false
+var recreate = false
 
-func watchFile(subSites [] string) {
+func watchFile(subSites map[string]*Galleries) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
@@ -28,16 +28,16 @@ func watchFile(subSites [] string) {
 			case event := <-watcher.Events:
 				log.Println("event:", event)
 				filterFile(event)
-				recreateZip = true
+				recreate = true
 			case err := <-watcher.Errors:
 				log.Println("error:", err)
 			}
 		}
 	}()
 
-	for _, subSite := range subSites {
-		err = watcher.Add(galleryPath + subSite + origImgDir)
-		err = watcher.Add(galleryPath + subSite + featImgDir)
+	for subSite := range subSites {
+		err = watcher.Add(galleryPath + subSite + "/" + origImgDir)
+		err = watcher.Add(galleryPath + subSite + "/" + featImgDir)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -57,11 +57,11 @@ func filterFile(event fsnotify.Event) {
 
 	if event.Op.String() == "CREATE" {
 		if imgKind == origImgDir {
-
+			go createImage(event.Name, galleryPath+subSite+thumbImgDir+"thumb"+filename, thumbSize)
 		} else if imgKind == featImgDir {
-			createImage(event.Name, galleryPath+subSite+thumbImgDir+"thumb"+filename, featSize)
+			go createImage(event.Name, galleryPath+subSite+thumbImgDir+"thumb"+filename, featSize)
 		}
-		createImage(event.Name, galleryPath+subSite+prevImgDir+"prev"+filename, prevSize)
+		go createImage(event.Name, galleryPath+subSite+prevImgDir+"prev"+filename, prevSize)
 	} else if event.Op.String() == "REMOVE" {
 		removeFile(galleryPath + subSite + prevImgDir + "prev" + filename)
 		removeFile(galleryPath + subSite + thumbImgDir + "thumb" + filename)
@@ -79,8 +79,9 @@ func createImage(input string, output string, size int) {
 	fmt.Println("Successfully created " + strconv.Itoa(size))
 }
 
-func checkSubSites(subSites []string) {
-	for _, subSite := range subSites {
+func checkSubSites(subSites map[string]*Galleries) {
+	for subSite := range subSites {
+		subSite = subSite + "/"
 		checkFiles(readDir(galleryPath+subSite+origImgDir), subSite, false)
 		checkFiles(readDir(galleryPath+subSite+featImgDir), subSite, true)
 

@@ -9,6 +9,7 @@ import (
 	"html/template"
 	"gopkg.in/yaml.v2"
 	"strings"
+	"path/filepath"
 )
 
 const origImgDir = "img/"
@@ -16,43 +17,41 @@ const prevImgDir = "preview/"
 const featImgDir = "featured/"
 const thumbImgDir = "thumbnail/"
 const galleryPath = "static/gallery/"
-const configPath = "config/"
 
 const thumbSize = 396
 const featSize = 796
 const prevSize = 1080
 
-var subSites []string
+var globConfig config
 
-type Page struct {
+type config struct {
+	Port      string
+	Galleries map[string]*Galleries
+}
+
+type Galleries struct {
 	Title       string
 	Description string
+	Download    bool
+	Images      map[string]bool
+	Dir 		dir
+}
+
+type dir struct {
 	OrigImgDir  string
 	PrevImgDir  string
 	ThumbImgDir string
 	FeatImgDir  string
 	GalleryPath string
-	Images      map[string]bool
-	Download    bool
 }
 
-func initPage() Page {
-	return Page{
+func initDir() dir {
+	return dir{
 		OrigImgDir:  origImgDir,
 		PrevImgDir:  prevImgDir,
 		ThumbImgDir: thumbImgDir,
 		FeatImgDir:  featImgDir,
 		GalleryPath: galleryPath,
-	}
-}
-
-func initSubSites() {
-	files := readDir(galleryPath)
-
-	for _, file := range files {
-		if file.IsDir() {
-			subSites = append(subSites, file.Name()+"/")
-		}
 	}
 }
 
@@ -72,39 +71,18 @@ func removeFile(input string) {
 	log.Println("File " + input + " successfull removed.")
 }
 
-func readYAML(filename string) (*Page, error) {
-	page := initPage()
-	source, err := ioutil.ReadFile(configPath + filename + ".yaml")
-	if err != nil {
-		panic(err)
-	}
-
-	err = yaml.Unmarshal(source, &page)
-	if err != nil {
-		panic(err)
-	}
-
-	page.Images = make(map[string]bool)
-
-	for _, orig := range readDir(galleryPath + page.Title + "/" + origImgDir) {
-		page.Images[orig.Name()] = false
-	}
-	for _, image := range readDir(galleryPath + page.Title + "/" + featImgDir) {
-		page.Images[image.Name()] = true
-	}
-
-	return &page, err
-}
-
 func galleryHandler(w http.ResponseWriter, r *http.Request) {
 	title := strings.Replace(r.URL.Path, "/", "", 2)
 
-	if recreateZip {
-		folders := []string{galleryPath + title + "/" + origImgDir,galleryPath + title + "/" +featImgDir}
+	if recreate {
+		folders := []string{galleryPath + title + "/" + origImgDir, galleryPath + title + "/" + featImgDir}
 		addZip(galleryPath+title+"/"+title+"_images.zip", folders)
+		getFeatured(globConfig,title)
 	}
 
-	p, _ := readYAML(title)
+	globConfig.Galleries[title].Dir = initDir()
+
+	p, _ := globConfig.Galleries[title]
 	t, _ := template.ParseFiles("gallery.html")
 	t.Execute(w, p)
 }
@@ -122,18 +100,51 @@ func staticHandler(w http.ResponseWriter, r *http.Request) {
 func initWebServer(port string) {
 	http.HandleFunc("/static/", staticHandler)
 
-	for _, file := range readDir(configPath) {
-		http.HandleFunc("/"+strings.Replace(file.Name(), ".yaml", "", 1), galleryHandler)
+	for subSite := range globConfig.Galleries {
+		http.HandleFunc("/"+subSite, galleryHandler)
 	}
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
+func readConfig(f string) config {
+	if _, err := os.Stat(f); os.IsNotExist(err) {
+		f, _ = filepath.Abs("./config.yaml")
+	}
+
+	var c config
+	source, err := ioutil.ReadFile(f)
+	if err != nil {
+		panic(err)
+	}
+
+	err = yaml.Unmarshal(source, &c)
+	if err != nil {
+		panic(err)
+	}
+	for subSite := range c.Galleries {
+		getFeatured(c, subSite)
+	}
+
+	return c
+}
+
+func getFeatured(c config, subSite string) config {
+	c.Galleries[subSite].Images = make(map[string]bool)
+	for _, orig := range readDir(galleryPath + subSite + "/" + origImgDir) {
+		c.Galleries[subSite].Images[orig.Name()] = false
+	}
+	for _, orig := range readDir(galleryPath + subSite + "/" + featImgDir) {
+		c.Galleries[subSite].Images[orig.Name()] = true
+	}
+	return c
+}
+
 func main() {
-	//go initWebServer("8080")
-	//initSubSites()
-	//checkSubSites(subSites)
-	//
-	//watchFile(subSites)
-	cliAccess()
+	globConfig = readConfig("")
+	go initWebServer(globConfig.Port)
+	checkSubSites(globConfig.Galleries)
+
+	watchFile(globConfig.Galleries)
+	//cliAccess()
 }
