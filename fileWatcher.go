@@ -8,11 +8,15 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"github.com/mholt/archiver"
+	"strings"
 )
 
 const thumbSize = 384
 const featSize = 514
 const prevSize = 1080
+
+var recreateZip = false
 
 func watchFile(subSites [] string) {
 	watcher, err := fsnotify.NewWatcher()
@@ -28,6 +32,7 @@ func watchFile(subSites [] string) {
 			case event := <-watcher.Events:
 				log.Println("event:", event)
 				filterFile(event)
+				recreateZip = true
 			case err := <-watcher.Errors:
 				log.Println("error:", err)
 			}
@@ -55,9 +60,9 @@ func filterFile(event fsnotify.Event) {
 	imgKind := imgKindReplace.FindString(event.Name[len(galleryPath+subSite):]) + "/"
 
 	if event.Op.String() == "CREATE" {
-		if (imgKind == origImgDir) {
+		if imgKind == origImgDir {
 
-		} else if (imgKind == featImgDir) {
+		} else if imgKind == featImgDir {
 			createImage(event.Name, galleryPath+subSite+thumbImgDir+"thumb"+filename, featSize)
 		}
 		createImage(event.Name, galleryPath+subSite+prevImgDir+"prev"+filename, prevSize)
@@ -67,19 +72,9 @@ func filterFile(event fsnotify.Event) {
 	}
 }
 
-//func createThumb(input string, output string) {
-//	cmd := "magick"
-//	args := []string{input, "-define", "jpeg:size=786x", "-auto-orient", "-quality", "80", "-thumbnail", "384x", "-unsharp", "0x.5", output}
-//	if err := exec.Command(cmd, args...).Run(); err != nil {
-//		fmt.Fprintln(os.Stderr, err)
-//		os.Exit(1)
-//	}
-//	fmt.Println("Successfully created thumbnail.")
-//}
-
 func createImage(input string, output string, size int) {
 	cmd := "magick"
-	args := []string{input, "-define", "jpeg:size=" + "x" + strconv.Itoa(size*2), "-auto-orient", "-quality", "80", "-thumbnail", "x" + strconv.Itoa(size), "-unsharp", "0x.5", output}
+	args := []string{input, "-define", "jpeg:size=" + strconv.Itoa(size*2) + "x", "-auto-orient", "-quality", "80", "-thumbnail", strconv.Itoa(size) + "x", "-unsharp", "0x.5", output}
 	log.Println(args)
 	if err := exec.Command(cmd, args...).Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -88,20 +83,13 @@ func createImage(input string, output string, size int) {
 	fmt.Println("Successfully created " + strconv.Itoa(size))
 }
 
-//func createPrev(input string, output string) {
-//	cmd := "magick"
-//	args := []string{input, "-define", "jpeg:size=2160x", "-auto-orient", "-thumbnail", "1080x", "-unsharp", "0x.5", output}
-//	if err := exec.Command(cmd, args...).Run(); err != nil {
-//		fmt.Fprintln(os.Stderr, err)
-//		os.Exit(1)
-//	}
-//	fmt.Println("Successfully created preview.")
-//}
-
 func checkSubSites(subSites []string) {
 	for _, subSite := range subSites {
 		checkFiles(readDir(galleryPath+subSite+origImgDir), subSite, false)
 		checkFiles(readDir(galleryPath+subSite+featImgDir), subSite, true)
+
+		folders := []string{galleryPath + subSite + origImgDir, galleryPath + subSite + featImgDir}
+		addZip(galleryPath+subSite+strings.Replace(subSite, "/", "", 1)+"_images.zip", folders)
 	}
 }
 
@@ -125,13 +113,11 @@ func checkFiles(files []os.FileInfo, subSite string, featured bool) {
 	}
 }
 
-//func checkFiles(subSites []string) {
-//	for _, file := range files {
-//		if _, err := os.Stat(galleryPath + path + thumbImgDir + "thumb" + file.Name()); os.IsNotExist(err) {
-//			createThumb(galleryPath+path+origImgDir+file.Name(), galleryPath+path+thumbImgDir+"thumb"+file.Name())
-//		}
-//		if _, err := os.Stat(galleryPath + path + prevImgDir + "prev" + file.Name()); os.IsNotExist(err) {
-//			createImage(galleryPath+path+origImgDir+file.Name(), galleryPath+path+prevImgDir+"prev"+file.Name(), prevSize)
-//		}
-//	}
-//}
+func addZip(output string, path []string) {
+	log.Println(output)
+	log.Println(path)
+	err := archiver.Zip.Make(output, path)
+	if err != nil {
+		log.Fatal(err)
+	}
+}

@@ -26,10 +26,10 @@ type Page struct {
 	OrigImgDir  string
 	PrevImgDir  string
 	ThumbImgDir string
-	FeatImgDir	string
+	FeatImgDir  string
 	GalleryPath string
 	Images      map[string]bool
-	Download 	bool
+	Download    bool
 }
 
 func initPage() Page {
@@ -37,7 +37,7 @@ func initPage() Page {
 		OrigImgDir:  origImgDir,
 		PrevImgDir:  prevImgDir,
 		ThumbImgDir: thumbImgDir,
-		FeatImgDir: featImgDir,
+		FeatImgDir:  featImgDir,
 		GalleryPath: galleryPath,
 	}
 }
@@ -95,6 +95,11 @@ func readYAML(filename string) (*Page, error) {
 func galleryHandler(w http.ResponseWriter, r *http.Request) {
 	title := strings.Replace(r.URL.Path, "/", "", 2)
 
+	if recreateZip {
+		folders := []string{galleryPath + title + "/" + origImgDir,galleryPath + title + "/" +featImgDir}
+		addZip(galleryPath+title+"/"+title+"_images.zip", folders)
+	}
+
 	p, _ := readYAML(title)
 	t, _ := template.ParseFiles("gallery.html")
 	t.Execute(w, p)
@@ -126,4 +131,7 @@ func main() {
 
 	go watchFile(subSites)
 	initWebServer("8080")
+	//subSite := "ungarn/"
+	//folders := []string{galleryPath + subSite + origImgDir,galleryPath + subSite +featImgDir}
+	//addZip(galleryPath+subSite+strings.Replace(subSite,"/","",1)+"_images.zip", folders)
 }

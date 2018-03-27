@@ -54,6 +54,7 @@
     min-width: 100%;
     min-height: 516px;
     object-fit: cover;
+    max-height: none;
 }
 
 .container {

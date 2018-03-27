@@ -23,7 +23,7 @@
             <div class="grid-item meta grid-item--full-width">
                 <h1 class="page-header">{{.Title}}</h1>
                 <h6 class="page-describtion">{{.Description}}</h6>
-                {{ if .Download }}<a class="button button-primary" href="">Download</a>{{ end }}
+                {{ if .Download }}<a class="button button-primary" href="/{{ .GalleryPath }}{{ .Title }}/{{ .Title }}_images.zip">Download</a>{{ end }}
             </div>
 
         {{ $prevDir     :=      .PrevImgDir}}
@@ -36,9 +36,9 @@
         {{ range $image,$feature := .Images }}
             <div class='grid-item {{ if $feature }}feature{{end}}'>
                 <a class='chocolat-image' title='Download'
-                   href='/{{ $gallDir }}{{ $title }}/{{ $prevDir }}/prev{{ $image }}'
+                   href='/{{ $gallDir }}{{ $title }}/{{ $prevDir }}prev{{ $image }}'
                    download_href='/{{ $gallDir }}{{ $title }}/{{ if $feature }}{{ $featDir }}{{ else }}{{ $origDir }}{{ end }}{{ $image }}'>
-                    <img src='/{{ $gallDir }}{{ $title }}/{{ $thumbDir }}/thumb{{ $image }}'/>
+                    <img src='/{{ $gallDir }}{{ $title }}/{{ $thumbDir }}thumb{{ $image }}'/>
                 </a>
             </div>
         {{ end }}
