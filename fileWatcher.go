@@ -1,4 +1,4 @@
-package main
+package gollery
 
 import (
 	"log"
@@ -92,14 +92,14 @@ func checkSubSites(subSites map[string]*Galleries) {
 
 func checkFiles(files []os.FileInfo, subSite string, featured bool) {
 	for _, file := range files {
-		if _, err := os.Stat(galleryPath + subSite + thumbImgDir + "thumb" + file.Name()); os.IsNotExist(err) {
+		if checkFile(galleryPath + subSite + thumbImgDir + "thumb" + file.Name()) {
 			if featured {
 				go createImage(galleryPath+subSite+featImgDir+file.Name(), galleryPath+subSite+thumbImgDir+"thumb"+file.Name(), featSize)
 			} else {
 				go createImage(galleryPath+subSite+origImgDir+file.Name(), galleryPath+subSite+thumbImgDir+"thumb"+file.Name(), thumbSize)
 			}
 		}
-		if _, err := os.Stat(galleryPath + subSite + prevImgDir + "prev" + file.Name()); os.IsNotExist(err) {
+		if checkFile(galleryPath + subSite + prevImgDir + "prev" + file.Name()) {
 			if featured {
 				go createImage(galleryPath+subSite+featImgDir+file.Name(), galleryPath+subSite+prevImgDir+"prev"+file.Name(), prevSize)
 

@@ -61,6 +61,10 @@
 
 /*endregion*/
 
+.chocolat-open {
+    overflow: scroll !important;
+}
+
 @media screen and (max-width: 450px) {
     .grid-sizer, .grid-item {
         width: 48%;
