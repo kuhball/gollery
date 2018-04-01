@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/kletteraffe11/gollery"
+	"github.com/scouball/gollery"
 )
 
 func main() {
