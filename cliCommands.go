@@ -204,6 +204,14 @@ func CliAccess() {
 					GlobConfig = ReadConfig(directory+"/config.yaml", true)
 				}
 
+				if c.String("webpath") == "" {
+					webPath = getGoPath() + "/src/github.com/scouball/gollery/"
+				} else {
+					webPath = c.String("webpath")
+				}
+
+				log.Print(c.String("webpath"))
+
 				initWebServer(GlobConfig.Port)
 				//checkSubSites(GlobConfig.Galleries)
 
@@ -212,6 +220,7 @@ func CliAccess() {
 			},
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "directory, d", Usage: "root path for gollery", Destination: &directory},
+				cli.StringFlag{Name: "webpath, p", Usage: "custom location for web folder (needed for docker)"},
 				cli.BoolFlag{Name: "webserver, w", Usage: "only start webserver"},
 				cli.BoolFlag{Name: "filewatcher, f", Usage: "only start filewatcher"},
 			},

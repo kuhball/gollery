@@ -16,7 +16,7 @@ const featSize = 796
 const prevSize = 1080
 
 var GlobConfig Config
-var appPath = getGoPath() + `\src\github.com\kletteraffe11\gollery\`
+var webPath string
 var galleryPath = getDir() + "/"
 
 
@@ -40,6 +40,7 @@ type dir struct {
 	FeatImgDir  string
 	GalleryPath string
 }
+
 
 func initDir() dir {
 	return dir{

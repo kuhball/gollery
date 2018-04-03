@@ -19,12 +19,12 @@ func galleryHandler(w http.ResponseWriter, r *http.Request) {
 
 	GlobConfig.Galleries[title].Dir = initDir()
 
-	t, _ := template.ParseFiles(appPath + "web/template/gallery.html")
+	t, _ := template.ParseFiles(webPath + "template/gallery.html")
 	t.Execute(w, GlobConfig.Galleries[title])
 }
 
 func staticHandler(w http.ResponseWriter, r *http.Request) {
-	path := appPath + "/web/" + r.URL.Path
+	path := webPath + "/" + r.URL.Path
 	if f, err := os.Stat(path); err == nil && !f.IsDir() {
 		http.ServeFile(w, r, path)
 		return
