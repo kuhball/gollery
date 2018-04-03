@@ -12,6 +12,8 @@ WORKDIR /gollery
 COPY --from=build-env /go/bin/gollery /usr/bin/
 COPY --from=build-env /go/src/github.com/scouball/gollery/web /web/
 
+RUN apk --update add imagemagick
+
 ENTRYPOINT gollery start -p /web/
 
 EXPOSE 8080

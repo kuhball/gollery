@@ -46,7 +46,7 @@ func watchFile(subSites map[string]*Galleries) {
 }
 
 func filterFile(event fsnotify.Event) {
-	filenameReplace, _ := regexp.Compile(`(\w*\\)`)
+	filenameReplace, _ := regexp.Compile(`(\w:)*(\w*\\)`)
 	filename := filenameReplace.ReplaceAllString(event.Name, "")
 
 	subSiteReplace, _ := regexp.Compile(`(\w*)`)
@@ -63,6 +63,7 @@ func filterFile(event fsnotify.Event) {
 		}
 		go createImage(event.Name, galleryPath+subSite+prevImgDir+"prev"+filename, prevSize)
 	} else if event.Op.String() == "REMOVE" {
+		log.Print(filename)
 		removeFile(galleryPath + subSite + prevImgDir + "prev" + filename)
 		removeFile(galleryPath + subSite + thumbImgDir + "thumb" + filename)
 	}

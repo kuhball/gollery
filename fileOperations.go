@@ -10,14 +10,14 @@ import (
 )
 
 func readDir(dir string) []os.FileInfo {
-	files, err := ioutil.ReadDir(dir)
+	files, err := ioutil.ReadDir(filepath.FromSlash(dir))
 	check(err)
 
 	return files
 }
 
 func removeFile(input string){
-	if err := os.Remove(input); err != nil {
+	if err := os.Remove(filepath.FromSlash(input)); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	}
 	log.Println("File " + input + " successfull removed.")
@@ -26,7 +26,7 @@ func removeFile(input string){
 func getDir() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	check(err)
-	return dir
+	return filepath.ToSlash(dir)
 }
 
 func getGoPath() string {
@@ -34,7 +34,7 @@ func getGoPath() string {
 	if gopath == "" {
 		gopath = build.Default.GOPATH
 	}
-	return gopath
+	return filepath.ToSlash(gopath)
 }
 
 
@@ -45,6 +45,6 @@ func check(e error) {
 }
 
 func checkFile (path string) bool {
-	_, err := os.Stat(path)
+	_, err := os.Stat(filepath.FromSlash(path))
 	return os.IsNotExist(err)
 }

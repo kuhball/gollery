@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"path/filepath"
 )
 
 func initGollery(path string) error {
@@ -152,7 +153,7 @@ newTitle:
 }
 
 func createGalleries(path string) {
-	c := ReadConfig(path+`\config.yaml`, false)
+	c := ReadConfig(path+"/config.yaml", false)
 
 	log.Println(c)
 
@@ -205,17 +206,15 @@ func CliAccess() {
 				}
 
 				if c.String("webpath") == "" {
-					webPath = getGoPath() + "/src/github.com/scouball/gollery/"
+					webPath = getGoPath() + "/src/github.com/scouball/gollery/web/"
 				} else {
-					webPath = c.String("webpath")
+					webPath = filepath.ToSlash(c.String("webpath"))
 				}
 
-				log.Print(c.String("webpath"))
+				go initWebServer(GlobConfig.Port)
+				checkSubSites(GlobConfig.Galleries)
 
-				initWebServer(GlobConfig.Port)
-				//checkSubSites(GlobConfig.Galleries)
-
-				//watchFile(GlobConfig.Galleries)
+				watchFile(GlobConfig.Galleries)
 				return nil
 			},
 			Flags: []cli.Flag{
