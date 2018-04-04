@@ -37,10 +37,9 @@ func watchFile(subSites map[string]*Galleries) {
 
 	for subSite := range subSites {
 		err = watcher.Add(galleryPath + subSite + "/" + origImgDir)
+		check(err)
 		err = watcher.Add(galleryPath + subSite + "/" + featImgDir)
-		if err != nil {
-			log.Fatal(err)
-		}
+		check(err)
 	}
 	<-done
 }
@@ -113,7 +112,5 @@ func checkFiles(files []os.FileInfo, subSite string, featured bool) {
 
 func addZip(output string, path []string) {
 	err := archiver.Zip.Make(output, path)
-	if err != nil {
-		log.Fatal(err)
-	}
+	check(err)
 }

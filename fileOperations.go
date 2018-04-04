@@ -12,6 +12,7 @@ import (
 	"github.com/xor-gate/goexif2/exif"
 	 _ "image/jpeg"
 	 _ "image/png"
+	"time"
 )
 
 func readDir(dir string) []os.FileInfo {
@@ -53,7 +54,7 @@ func checkFile(path string) bool {
 	return os.IsNotExist(err)
 }
 
-func returnImageData(path string) (string, float32) {
+func returnImageData(path string) (string, time.Time, float32) {
 	f, err := os.Open(filepath.FromSlash(path))
 	check(err)
 
@@ -66,5 +67,5 @@ func returnImageData(path string) (string, float32) {
 	tm, err := x.DateTime()
 	check(err)
 
-	return tm.Format("Mon, 2 Jan 2006"), float32(size.Width) / float32(size.Height)
+	return tm.Format("Mon, 2 Jan 2006"), tm ,float32(size.Width) / float32(size.Height)
 }

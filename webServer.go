@@ -10,6 +10,17 @@ import (
 	"github.com/NYTimes/gziphandler"
 )
 
+var t *template.Template
+
+func initTemplate() {
+
+	var err error
+	t, err = template.New("gallery.html").Funcs(template.FuncMap{
+		"minus": func(a, b int) int { return a - b },
+	}).ParseFiles(webPath + "template/gallery.html")
+	check(err)
+}
+
 func galleryHandler() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		title := strings.Replace(r.URL.Path, "/", "", 2)
@@ -17,13 +28,13 @@ func galleryHandler() http.HandlerFunc {
 		if recreate {
 			folders := []string{filepath.FromSlash(galleryPath + title + "/" + origImgDir), filepath.FromSlash(galleryPath + title + "/" + featImgDir)}
 			addZip(filepath.FromSlash(galleryPath+title+"/"+title+"_images.zip"), folders)
+			GlobConfig.Galleries[title].Images = GlobConfig.Galleries[title].Images[:0]
 			getFeatured(GlobConfig, title)
 		}
 
-		GlobConfig.Galleries[title].Dir = initDir()
-
-		t, _ := template.ParseFiles(filepath.FromSlash(webPath + "template/gallery.html"))
-		t.Execute(w, GlobConfig.Galleries[title])
+		var err error
+		err = t.Execute(w, GlobConfig.Galleries[title])
+		check(err)
 	})
 }
 
@@ -49,10 +60,13 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func initWebServer(port string) {
+	go initTemplate()
+
 	http.HandleFunc("/static/", staticHandler)
 	http.HandleFunc("/image/", imageHandler)
 
 	for subSite := range GlobConfig.Galleries {
+		GlobConfig.Galleries[subSite].Dir = initDir()
 		http.Handle("/"+subSite, gziphandler.GzipHandler(galleryHandler()))
 	}
 

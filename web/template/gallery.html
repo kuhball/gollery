@@ -25,13 +25,25 @@
                 <hr>
             </div>
 
-        {{ range $image,$value := .Images }}
-            <div class='grid-item {{ if $value.Feature }}feature{{end}}' name="{{$image}}">
+        {{ range $key,$image := .Images }}
+        {{if ( or (eq $key 0) )}}
+            <div class="grid-item date">
+                <h3>{{$image.Date}}</h3>
+            </div>
+        {{end}}
+        {{if ( and (ne $key 0))}}
+        {{ if ne ($image.Date) (index $.Images (minus $key 1)).Date}}
+            <div class="grid-item date">
+                <h3>{{$image.Date}}</h3>
+            </div>
+        {{end }}
+        {{end}}
+            <div class='grid-item {{ if $image.Feature }}feature{{end}}' name="{{$image.Name}}">
                 <a class='chocolat-image'
-                   title='<a class="button chocolat-button" href="/{{ $.Dir.GalleryPath }}{{ $.Title }}/{{ if $value.Feature }}{{ $.Dir.FeatImgDir }}{{ else }}{{ $.Dir.OrigImgDir }}{{ end }}{{ $image }}" download>DOWNLOAD</a>'
-                   href='/{{ $.Dir.GalleryPath }}{{ $.Title }}/{{ $.Dir.PrevImgDir }}prev{{ $image }}'>
+                   title='<a class="button chocolat-button" href="/{{ $.Dir.GalleryPath }}{{ $.Title }}/{{ if $image.Feature }}{{ $.Dir.FeatImgDir }}{{ else }}{{ $.Dir.OrigImgDir }}{{ end }}{{ $image.Name }}" download>DOWNLOAD</a>'
+                   href='/{{ $.Dir.GalleryPath }}{{ $.Title }}/{{ $.Dir.PrevImgDir }}prev{{ $image.Name }}'>
                     <img alt="{{ $.Title }}"
-                         data-src='/{{ $.Dir.GalleryPath }}{{ $.Title }}/{{ $.Dir.ThumbImgDir }}thumb{{ $image }}'/>
+                         data-src='/{{ $.Dir.GalleryPath }}{{ $.Title }}/{{ $.Dir.ThumbImgDir }}thumb{{ $image.Name }}'/>
                 </a>
             </div>
         {{ end }}
