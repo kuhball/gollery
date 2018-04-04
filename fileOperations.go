@@ -7,6 +7,11 @@ import (
 	"fmt"
 	"log"
 	"go/build"
+
+	"image"
+	"github.com/xor-gate/goexif2/exif"
+	 _ "image/jpeg"
+	 _ "image/png"
 )
 
 func readDir(dir string) []os.FileInfo {
@@ -16,7 +21,7 @@ func readDir(dir string) []os.FileInfo {
 	return files
 }
 
-func removeFile(input string){
+func removeFile(input string) {
 	if err := os.Remove(filepath.FromSlash(input)); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	}
@@ -37,14 +42,29 @@ func getGoPath() string {
 	return filepath.ToSlash(gopath)
 }
 
-
 func check(e error) {
 	if e != nil {
 		log.Fatal(e)
 	}
 }
 
-func checkFile (path string) bool {
+func checkFile(path string) bool {
 	_, err := os.Stat(filepath.FromSlash(path))
 	return os.IsNotExist(err)
+}
+
+func returnImageData(path string) (string, float32) {
+	f, err := os.Open(filepath.FromSlash(path))
+	check(err)
+
+	size, _, err := image.DecodeConfig(f)
+	check(err)
+
+	x, err := exif.Decode(f)
+	check(err)
+
+	tm, err := x.DateTime()
+	check(err)
+
+	return tm.Format("Mon, 2 Jan 2006"), float32(size.Width) / float32(size.Height)
 }

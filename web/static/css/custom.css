@@ -16,10 +16,11 @@
 
 .grid-item img {
     display: block;
-    max-width: 100%;
     min-width: 100%;
-    max-height: 522px;
+    min-height: 100%;
     object-fit: cover;
+    max-height: 100%;
+    max-width: 100%;
 }
 
 .feature {
@@ -28,9 +29,7 @@
 
 .feature img {
     min-width: 100%;
-    min-height: 522px;
     object-fit: cover;
-    max-height: 1048px;
 }
 
 .meta {
@@ -70,8 +69,13 @@
         width: 48%;
     }
 
+    .meta {
+        width: 100%;
+    }
+
     .feature {
         width: 96.7%;
+        max-height: 586px;
     }
 
     .feature img {

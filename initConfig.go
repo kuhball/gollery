@@ -19,7 +19,6 @@ var GlobConfig Config
 var webPath string
 var galleryPath = getDir() + "/"
 
-
 type Config struct {
 	Port      string
 	Galleries map[string]*Galleries
@@ -29,8 +28,14 @@ type Galleries struct {
 	Title       string
 	Description string
 	Download    bool
-	Images      map[string]bool `yaml:"-"`
-	Dir         dir				`yaml:"-"`
+	Images      map[string]Image `yaml:"-"`
+	Dir         dir              `yaml:"-"`
+}
+
+type Image struct {
+	Feature  bool
+	Date     string
+	Ratio	 float32
 }
 
 type dir struct {
@@ -40,7 +45,6 @@ type dir struct {
 	FeatImgDir  string
 	GalleryPath string
 }
-
 
 func initDir() dir {
 	return dir{
@@ -77,12 +81,25 @@ func ReadConfig(f string, feature bool) Config {
 }
 
 func getFeatured(c Config, subSite string) Config {
-	c.Galleries[subSite].Images = make(map[string]bool)
+	c.Galleries[subSite].Images = make(map[string]Image)
 	for _, orig := range readDir(subSite + "/" + origImgDir) {
-		c.Galleries[subSite].Images[orig.Name()] = false
+		date, ratio := returnImageData(subSite + "/" + origImgDir  + orig.Name())
+		c.Galleries[subSite].Images[orig.Name()] = Image{Date: date, Feature: false, Ratio: ratio}
 	}
 	for _, orig := range readDir(subSite + "/" + featImgDir) {
-		c.Galleries[subSite].Images[orig.Name()] = true
+		date, ratio := returnImageData(subSite + "/" + featImgDir + "/" + orig.Name())
+		c.Galleries[subSite].Images[orig.Name()] = Image{Date: date, Feature: true, Ratio: ratio}
 	}
+	//var previousDate string
+	//for _, image := range c.Galleries[subSite].Images {
+	//	if image.Date == previousDate {
+	//		image.Date = ""
+	//	} else {
+	//		previousDate = image.Date
+	//	}
+	//}
+	//for image := range c.Galleries[subSite].Images {
+	//	log.Print(image)
+	//}
 	return c
 }

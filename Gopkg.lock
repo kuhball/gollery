@@ -93,6 +93,15 @@
   version = "v1.20.0"
 
 [[projects]]
+  name = "github.com/xor-gate/goexif2"
+  packages = [
+    "exif",
+    "tiff"
+  ]
+  revision = "78b42f396c46d1cb2fda9148d0ff77c615cb6caf"
+  version = "v1.1.0"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
@@ -107,6 +116,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2d73ba4932133513c57422cbbd6b363f79db7200720bb736db79a88247bc4b62"
+  inputs-digest = "14b5b1c6c3eaebcee6a10e9f9815dd07390c67517fea7e371e07b8af04efd658"
   solver-name = "gps-cdcl"
   solver-version = 1

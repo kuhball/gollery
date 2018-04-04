@@ -7,21 +7,24 @@ import (
 	"strings"
 	"html/template"
 	"path/filepath"
+	"github.com/NYTimes/gziphandler"
 )
 
-func galleryHandler(w http.ResponseWriter, r *http.Request) {
-	title := strings.Replace(r.URL.Path, "/", "", 2)
+func galleryHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		title := strings.Replace(r.URL.Path, "/", "", 2)
 
-	if recreate {
-		folders := []string{filepath.FromSlash(galleryPath + title + "/" + origImgDir), filepath.FromSlash(galleryPath + title + "/" + featImgDir)}
-		addZip(filepath.FromSlash(galleryPath + title + "/" + title + "_images.zip"), folders)
-		getFeatured(GlobConfig, title)
-	}
+		if recreate {
+			folders := []string{filepath.FromSlash(galleryPath + title + "/" + origImgDir), filepath.FromSlash(galleryPath + title + "/" + featImgDir)}
+			addZip(filepath.FromSlash(galleryPath+title+"/"+title+"_images.zip"), folders)
+			getFeatured(GlobConfig, title)
+		}
 
-	GlobConfig.Galleries[title].Dir = initDir()
+		GlobConfig.Galleries[title].Dir = initDir()
 
-	t, _ := template.ParseFiles(filepath.FromSlash(webPath + "template/gallery.html"))
-	t.Execute(w, GlobConfig.Galleries[title])
+		t, _ := template.ParseFiles(filepath.FromSlash(webPath + "template/gallery.html"))
+		t.Execute(w, GlobConfig.Galleries[title])
+	})
 }
 
 func staticHandler(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +53,7 @@ func initWebServer(port string) {
 	http.HandleFunc("/image/", imageHandler)
 
 	for subSite := range GlobConfig.Galleries {
-		http.HandleFunc("/"+subSite, galleryHandler)
+		http.Handle("/"+subSite, gziphandler.GzipHandler(galleryHandler()))
 	}
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))
