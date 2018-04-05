@@ -13,9 +13,13 @@ import (
 	"github.com/mholt/archiver"
 )
 
+// used for zip recreation - changed by watcher event
 var recreate = false
 
-func watchFile(subSites map[string]*Galleries) {
+// initialize a new fsnotify watcher
+// watcher calls filterfile() in case of an event
+// the origImgDir and featImgDir from all galleries are added to the watcher
+func watchFile(galleries map[string]*Gallery) {
 	watcher, err := fsnotify.NewWatcher()
 	check(err)
 
@@ -35,43 +39,49 @@ func watchFile(subSites map[string]*Galleries) {
 		}
 	}()
 
-	for subSite := range subSites {
-		err = watcher.Add(galleryPath + subSite + "/" + origImgDir)
+	for gallery := range galleries {
+		err = watcher.Add(galleryPath + gallery + "/" + origImgDir)
 		check(err)
-		err = watcher.Add(galleryPath + subSite + "/" + featImgDir)
+		err = watcher.Add(galleryPath + gallery + "/" + featImgDir)
 		check(err)
 	}
 	<-done
 }
 
+// regex expressions for getting the filename, gallery & image kind (orig / feat)
+// In case of a "CREATE" operation preview and thumbnail images are created with different sizes for feat and orig.
+// In case of a "REMOVE" operation preview and thumbnail images are removed from the filesystem
 func filterFile(event fsnotify.Event) {
 	filenameReplace, _ := regexp.Compile(`(\w:)*(\w*\\)`)
 	filename := filenameReplace.ReplaceAllString(event.Name, "")
 
-	subSiteReplace, _ := regexp.Compile(`(\w*)`)
-	subSite := subSiteReplace.FindString(event.Name[len(galleryPath):]) + "/"
+	galleryReplace, _ := regexp.Compile(`(\w*)`)
+	gallery := galleryReplace.FindString(event.Name[len(galleryPath):]) + "/"
 
 	imgKindReplace, _ := regexp.Compile(`(\w*)`)
-	imgKind := imgKindReplace.FindString(event.Name[len(galleryPath+subSite):]) + "/"
+	imgKind := imgKindReplace.FindString(event.Name[len(galleryPath+gallery):]) + "/"
 
 	if event.Op.String() == "CREATE" {
 		if imgKind == origImgDir {
-			go createImage(event.Name, galleryPath+subSite+thumbImgDir+"thumb"+filename, thumbSize)
+			go createImage(event.Name, galleryPath+gallery+thumbImgDir+"thumb"+filename, thumbSize)
 		} else if imgKind == featImgDir {
-			go createImage(event.Name, galleryPath+subSite+thumbImgDir+"feat"+filename, featSize)
+			go createImage(event.Name, galleryPath+gallery+thumbImgDir+"feat"+filename, featSize)
 		}
-		go createImage(event.Name, galleryPath+subSite+prevImgDir+"prev"+filename, prevSize)
+		go createImage(event.Name, galleryPath+gallery+prevImgDir+"prev"+filename, prevSize)
 	} else if event.Op.String() == "REMOVE" {
 		log.Print(filename)
-		removeFile(galleryPath + subSite + prevImgDir + "prev" + filename)
+		removeFile(galleryPath + gallery + prevImgDir + "prev" + filename)
 		if imgKind == origImgDir {
-			removeFile(galleryPath + subSite + thumbImgDir + "thumb" + filename)
+			removeFile(galleryPath + gallery + thumbImgDir + "thumb" + filename)
 		} else if imgKind == featImgDir {
-			removeFile(galleryPath + subSite + thumbImgDir + "feat" + filename)
+			removeFile(galleryPath + gallery + thumbImgDir + "feat" + filename)
 		}
 	}
 }
 
+// This function calls the cli tool magick
+// The input image is loaded and a new output image is created with a given size
+// Magick options are adjusted for thumbnails.
 func createImage(input string, output string, size int) {
 	cmd := "magick"
 	args := []string{input, "-define", "jpeg:size=" + strconv.Itoa(size*2) + "x", "-auto-orient", "-quality", "80", "-thumbnail", strconv.Itoa(size) + "x", "-unsharp", "0x.5", output}
@@ -83,34 +93,40 @@ func createImage(input string, output string, size int) {
 	fmt.Println("Successfully created " + strconv.Itoa(size))
 }
 
-func checkSubSites(subSites map[string]*Galleries) {
-	for subSite := range subSites {
-		subSite = subSite + "/"
-		checkFiles(readDir(galleryPath+subSite+origImgDir), subSite, false)
-		checkFiles(readDir(galleryPath+subSite+featImgDir), subSite, true)
+// Calls checkFiles for every galleries orig and feat images
+// Creates a zip file with all images.
+// Called at the start of gollery.
+func checkSubSites(galleries map[string]*Gallery) {
+	for gallery := range galleries {
+		gallery = gallery + "/"
+		checkFiles(readDir(galleryPath+gallery+origImgDir), gallery, false)
+		checkFiles(readDir(galleryPath+gallery+featImgDir), gallery, true)
 
-		folders := []string{galleryPath + subSite + origImgDir, galleryPath + subSite + featImgDir}
-		addZip(galleryPath+subSite+strings.Replace(subSite, "/", "", 1)+"_images.zip", folders)
+		folders := []string{galleryPath + gallery + origImgDir, galleryPath + gallery + featImgDir}
+		addZip(galleryPath+gallery+strings.Replace(gallery, "/", "", 1)+"_images.zip", folders)
 	}
 }
 
-func checkFiles(files []os.FileInfo, subSite string, featured bool) {
+// Checks whether a thumbnail and preview has been created for all given images.
+// Creates thumbnail & preview in case they are not existing.
+func checkFiles(files []os.FileInfo, gallery string, featured bool) {
 	for _, file := range files {
-		if checkFile(galleryPath+subSite+thumbImgDir+"thumb"+file.Name()) && !featured {
-			go createImage(galleryPath+subSite+origImgDir+file.Name(), galleryPath+subSite+thumbImgDir+"thumb"+file.Name(), thumbSize)
-		} else if checkFile(galleryPath+subSite+thumbImgDir+"feat"+file.Name()) && featured {
-			go createImage(galleryPath+subSite+featImgDir+file.Name(), galleryPath+subSite+thumbImgDir+"feat"+file.Name(), featSize)
+		if checkFile(galleryPath+gallery+thumbImgDir+"thumb"+file.Name()) && !featured {
+			go createImage(galleryPath+gallery+origImgDir+file.Name(), galleryPath+gallery+thumbImgDir+"thumb"+file.Name(), thumbSize)
+		} else if checkFile(galleryPath+gallery+thumbImgDir+"feat"+file.Name()) && featured {
+			go createImage(galleryPath+gallery+featImgDir+file.Name(), galleryPath+gallery+thumbImgDir+"feat"+file.Name(), featSize)
 		}
-		if checkFile(galleryPath + subSite + prevImgDir + "prev" + file.Name()) {
+		if checkFile(galleryPath + gallery + prevImgDir + "prev" + file.Name()) {
 			if featured {
-				go createImage(galleryPath+subSite+featImgDir+file.Name(), galleryPath+subSite+prevImgDir+"prev"+file.Name(), prevSize)
+				go createImage(galleryPath+gallery+featImgDir+file.Name(), galleryPath+gallery+prevImgDir+"prev"+file.Name(), prevSize)
 			} else {
-				go createImage(galleryPath+subSite+origImgDir+file.Name(), galleryPath+subSite+prevImgDir+"prev"+file.Name(), prevSize)
+				go createImage(galleryPath+gallery+origImgDir+file.Name(), galleryPath+gallery+prevImgDir+"prev"+file.Name(), prevSize)
 			}
 		}
 	}
 }
 
+// Creates a zip file at the output location with every given path within path[]
 func addZip(output string, path []string) {
 	err := archiver.Zip.Make(output, path)
 	check(err)

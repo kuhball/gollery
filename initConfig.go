@@ -22,12 +22,14 @@ var GlobConfig Config
 var webPath string
 var galleryPath = getDir() + "/"
 
+// Struct for the config.yaml with Port and all the galleries.
 type Config struct {
 	Port      string
-	Galleries map[string]*Galleries
+	Galleries map[string]*Gallery
 }
 
-type Galleries struct {
+// Struct for a gallery within the config struct.
+type Gallery struct {
 	Title       string
 	Description string
 	Download    bool
@@ -35,6 +37,7 @@ type Galleries struct {
 	Dir         dir     `yaml:"-"`
 }
 
+// Struct for image within gallery struct.
 type Image struct {
 	Name    string
 	Date    string
@@ -43,6 +46,7 @@ type Image struct {
 	Feature bool
 }
 
+// Struct for all the paths - needed in the html template
 type dir struct {
 	OrigImgDir  string
 	PrevImgDir  string
@@ -51,6 +55,7 @@ type dir struct {
 	GalleryPath string
 }
 
+// Initialize the paths for the images
 func initDir() dir {
 	return dir{
 		OrigImgDir:  origImgDir,
@@ -61,7 +66,11 @@ func initDir() dir {
 	}
 }
 
-func ReadConfig(f string, feature bool) Config {
+// Checks whether provided config path is valid
+// Read & unmarshal config.yaml
+// Call initImages for all galleries from the config file
+// TODO: add support for json config file
+func ReadConfig(f string, initialize bool) Config {
 	if checkFile(f) {
 		log.Fatal(f + ": Does not exist.")
 	}
@@ -72,26 +81,29 @@ func ReadConfig(f string, feature bool) Config {
 
 	err = yaml.Unmarshal(source, &c)
 	check(err)
-	if feature {
-		for subSite := range c.Galleries {
-			getFeatured(c, subSite)
+	if initialize {
+		for gallery := range c.Galleries {
+			initImages(c, gallery)
 		}
 	}
 
 	return c
 }
 
-func getFeatured(c Config, subSite string) Config {
-	for _, orig := range readDir(subSite + "/" + origImgDir) {
-		date, tm, ratio := returnImageData(subSite + "/" + origImgDir + orig.Name())
-		c.Galleries[subSite].Images = append(c.Galleries[subSite].Images, Image{Name: orig.Name(), Date: date, Time: tm, Feature: false, Ratio: ratio})
+// Read all origImgDir & featImgDir for the given gallery folder
+// Call returnImageData() for every image
+// Write image data into given config struct / gallery struct / image struct
+func initImages(c Config, gallery string) Config {
+	for _, orig := range readDir(gallery + "/" + origImgDir) {
+		date, tm, ratio := returnImageData(gallery + "/" + origImgDir + orig.Name())
+		c.Galleries[gallery].Images = append(c.Galleries[gallery].Images, Image{Name: orig.Name(), Date: date, Time: tm, Feature: false, Ratio: ratio})
 	}
-	for _, orig := range readDir(subSite + "/" + featImgDir) {
-		date, tm, ratio := returnImageData(subSite + "/" + featImgDir + "/" + orig.Name())
-		c.Galleries[subSite].Images = append(c.Galleries[subSite].Images, Image{Name: orig.Name(), Date: date, Time: tm, Feature: true, Ratio: ratio})
+	for _, orig := range readDir(gallery + "/" + featImgDir) {
+		date, tm, ratio := returnImageData(gallery + "/" + featImgDir + "/" + orig.Name())
+		c.Galleries[gallery].Images = append(c.Galleries[gallery].Images, Image{Name: orig.Name(), Date: date, Time: tm, Feature: true, Ratio: ratio})
 	}
-	sort.SliceStable(c.Galleries[subSite].Images, func(i, j int) bool {
-		return c.Galleries[subSite].Images[i].Time.Before(c.Galleries[subSite].Images[j].Time)
+	sort.SliceStable(c.Galleries[gallery].Images, func(i, j int) bool {
+		return c.Galleries[gallery].Images[i].Time.Before(c.Galleries[gallery].Images[j].Time)
 	})
 	return c
 }

@@ -1,3 +1,4 @@
+// TODO: improve all return strings
 package gollery
 
 import (
@@ -14,6 +15,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Function for creating a new root gallery folder
+// Checks whether a custom path was specified and uses current path if not.
+// Creates a custom_css folder, the config.yaml with a example gallery and the corresponding file structure
+// TODO: import the custom_css files into html template
 func initGollery(path string) error {
 	if path == "" {
 		pathSelect := promptui.Select{
@@ -81,15 +86,17 @@ func initGollery(path string) error {
 	return nil
 }
 
+// Creates an example gallery configuration
 func initExampleConfig() Config {
-	g := make(map[string]*Galleries)
-	e := Galleries{Title: "example", Description: "This is an example gallery.", Download: false}
+	g := make(map[string]*Gallery)
+	e := Gallery{Title: "example", Description: "This is an example gallery.", Download: false}
 	g["example"] = &e
 	c := Config{Port: "8080", Galleries: g}
 
 	return c
 }
 
+// Write a new config to the filesystem.
 func writeConfig(path string, c Config) {
 	d, err := yaml.Marshal(&c)
 	check(err)
@@ -98,10 +105,15 @@ func writeConfig(path string, c Config) {
 	check(err)
 }
 
+
+// Function creates a new gallery within an existing root folder and config.yaml
+// Reads the existing config file, asks for Title (unique), Description and Download (bool)
+// Writes new config and generates folder structure for new gallery
+// TODO: only generate new gallery structure, ignore existing galleries
 func newGallery(path string) error {
 	var err error
 	var s string
-	var newData Galleries
+	var newData Gallery
 
 	c := ReadConfig(path+"/config.yaml", false)
 
@@ -155,6 +167,10 @@ newTitle:
 	return nil
 }
 
+// Reads config.yaml from filesystem
+// Checks whether new gallery name already has a folder -> aborts if yes
+// TODO: check whether subfolders exist
+// Create all necessary subfolders for the gallery
 func createGalleries(path string) {
 	c := ReadConfig(path+"/config.yaml", false)
 
@@ -178,6 +194,8 @@ func createGalleries(path string) {
 	}
 }
 
+// Main function for all functionality
+// provides all cli arguments via cli plugin - read doc for more information
 func CliAccess() {
 	var directory string
 	var customDir string
