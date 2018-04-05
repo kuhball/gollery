@@ -1,18 +1,18 @@
 package gollery
 
 import (
-	"io/ioutil"
-	"path/filepath"
-	"os"
-	"fmt"
-	"log"
 	"go/build"
+	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
 
 	"image"
-	"github.com/xor-gate/goexif2/exif"
-	 _ "image/jpeg"
-	 _ "image/png"
+	_ "image/jpeg" //read jpeg files
+	_ "image/png"  //read png files
 	"time"
+
+	"github.com/xor-gate/goexif2/exif"
 )
 
 func readDir(dir string) []os.FileInfo {
@@ -23,9 +23,9 @@ func readDir(dir string) []os.FileInfo {
 }
 
 func removeFile(input string) {
-	if err := os.Remove(filepath.FromSlash(input)); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-	}
+	err := os.Remove(filepath.FromSlash(input))
+	check(err)
+
 	log.Println("File " + input + " successfull removed.")
 }
 
@@ -67,5 +67,5 @@ func returnImageData(path string) (string, time.Time, float32) {
 	tm, err := x.DateTime()
 	check(err)
 
-	return tm.Format("Mon, 2 Jan 2006"), tm ,float32(size.Width) / float32(size.Height)
+	return tm.Format("Mon, 2 Jan 2006"), tm, float32(size.Width) / float32(size.Height)
 }

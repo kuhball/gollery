@@ -1,24 +1,24 @@
 package gollery
 
 import (
-	"log"
-	"github.com/fsnotify/fsnotify"
-	"regexp"
-	"os/exec"
 	"fmt"
+	"log"
 	"os"
+	"os/exec"
+	"regexp"
 	"strconv"
-	"github.com/mholt/archiver"
 	"strings"
+
+	"github.com/fsnotify/fsnotify"
+	"github.com/mholt/archiver"
 )
 
 var recreate = false
 
 func watchFile(subSites map[string]*Galleries) {
 	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		log.Fatal(err)
-	}
+	check(err)
+
 	defer watcher.Close()
 
 	done := make(chan bool)
@@ -29,7 +29,7 @@ func watchFile(subSites map[string]*Galleries) {
 				log.Println("event:", event)
 				filterFile(event)
 				recreate = true
-			case err := <-watcher.Errors:
+			case err = <-watcher.Errors:
 				log.Println("error:", err)
 			}
 		}

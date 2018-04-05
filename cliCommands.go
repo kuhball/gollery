@@ -1,16 +1,17 @@
 package gollery
 
 import (
-	"os"
-	"github.com/urfave/cli"
-	"log"
 	"errors"
 	"fmt"
-	"github.com/manifoldco/promptui"
-	"strconv"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"log"
+	"os"
 	"path/filepath"
+	"strconv"
+
+	"github.com/manifoldco/promptui"
+	"github.com/urfave/cli"
+	"gopkg.in/yaml.v2"
 )
 
 func initGollery(path string) error {
@@ -44,13 +45,15 @@ func initGollery(path string) error {
 	}
 
 	if checkFile(path) {
-		os.Mkdir(path, 600)
+		err := os.Mkdir(path, 0600)
+		check(err)
 	} else {
 		log.Println("Directory is already existing.")
 	}
 
 	if checkFile("custom_css") {
-		os.Mkdir(path+"/custom_css", 600)
+		err := os.Mkdir(path+"/custom_css", 0600)
+		check(err)
 	} else {
 		log.Println("costum_css folder is already existing.")
 	}
@@ -159,11 +162,16 @@ func createGalleries(path string) {
 
 	for subsite := range c.Galleries {
 		if checkFile(path + "/" + subsite) {
-			os.Mkdir(path+"/"+subsite, 600)
-			os.Mkdir(path+"/"+subsite+"/img", 600)
-			os.Mkdir(path+"/"+subsite+"/featured", 600)
-			os.Mkdir(path+"/"+subsite+"/preview", 600)
-			os.Mkdir(path+"/"+subsite+"/thumbnail", 600)
+			err := os.Mkdir(path+"/"+subsite, 0600)
+			check(err)
+			err = os.Mkdir(path+"/"+subsite+"/img", 0600)
+			check(err)
+			err = os.Mkdir(path+"/"+subsite+"/featured", 0600)
+			check(err)
+			err = os.Mkdir(path+"/"+subsite+"/preview", 0600)
+			check(err)
+			err = os.Mkdir(path+"/"+subsite+"/thumbnail", 0600)
+			check(err)
 		} else {
 			log.Println(subsite + " structure is already existing.")
 		}
@@ -241,9 +249,8 @@ func CliAccess() {
 			Action: func(c *cli.Context) error {
 				if customDir == "" {
 					return newPrompts(getDir())
-				} else {
-					return newPrompts(customDir)
 				}
+				return newPrompts(customDir)
 			},
 		},
 	}

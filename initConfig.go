@@ -2,10 +2,11 @@ package gollery
 
 import (
 	"io/ioutil"
-	"gopkg.in/yaml.v2"
 	"log"
 	"sort"
 	"time"
+
+	"gopkg.in/yaml.v2"
 )
 
 const origImgDir = "img/"
@@ -36,10 +37,10 @@ type Galleries struct {
 
 type Image struct {
 	Name    string
-	Feature bool
 	Date    string
 	Time    time.Time
 	Ratio   float32
+	Feature bool
 }
 
 type dir struct {
@@ -89,6 +90,8 @@ func getFeatured(c Config, subSite string) Config {
 		date, tm, ratio := returnImageData(subSite + "/" + featImgDir + "/" + orig.Name())
 		c.Galleries[subSite].Images = append(c.Galleries[subSite].Images, Image{Name: orig.Name(), Date: date, Time: tm, Feature: true, Ratio: ratio})
 	}
-	sort.SliceStable(c.Galleries[subSite].Images, func(i, j int) bool { return c.Galleries[subSite].Images[i].Time.Before(c.Galleries[subSite].Images[j].Time) })
+	sort.SliceStable(c.Galleries[subSite].Images, func(i, j int) bool {
+		return c.Galleries[subSite].Images[i].Time.Before(c.Galleries[subSite].Images[j].Time)
+	})
 	return c
 }
