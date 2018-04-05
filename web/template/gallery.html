@@ -43,7 +43,7 @@
                    title='<a class="button chocolat-button" href="/{{ $.Dir.GalleryPath }}{{ $.Title }}/{{ if $image.Feature }}{{ $.Dir.FeatImgDir }}{{ else }}{{ $.Dir.OrigImgDir }}{{ end }}{{ $image.Name }}" download>DOWNLOAD</a>'
                    href='/{{ $.Dir.GalleryPath }}{{ $.Title }}/{{ $.Dir.PrevImgDir }}prev{{ $image.Name }}'>
                     <img alt="{{ $.Title }}"
-                         data-src='/{{ $.Dir.GalleryPath }}{{ $.Title }}/{{ $.Dir.ThumbImgDir }}thumb{{ $image.Name }}'/>
+                         data-src='/{{ $.Dir.GalleryPath }}{{ $.Title }}/{{ $.Dir.ThumbImgDir }}{{if $image.Feature}}feat{{ else }}thumb{{end}}{{ $image.Name }}'/>
                 </a>
             </div>
         {{ end }}
@@ -65,7 +65,7 @@
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chocolat/0.4.19/js/jquery.chocolat.min.js"></script>
-<script src='https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js'></script>
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
 <script src="/static/js/index.js"></script>
 

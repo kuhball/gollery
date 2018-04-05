@@ -58,13 +58,17 @@ func filterFile(event fsnotify.Event) {
 		if imgKind == origImgDir {
 			go createImage(event.Name, galleryPath+subSite+thumbImgDir+"thumb"+filename, thumbSize)
 		} else if imgKind == featImgDir {
-			go createImage(event.Name, galleryPath+subSite+thumbImgDir+"thumb"+filename, featSize)
+			go createImage(event.Name, galleryPath+subSite+thumbImgDir+"feat"+filename, featSize)
 		}
 		go createImage(event.Name, galleryPath+subSite+prevImgDir+"prev"+filename, prevSize)
 	} else if event.Op.String() == "REMOVE" {
 		log.Print(filename)
 		removeFile(galleryPath + subSite + prevImgDir + "prev" + filename)
-		removeFile(galleryPath + subSite + thumbImgDir + "thumb" + filename)
+		if imgKind == origImgDir {
+			removeFile(galleryPath + subSite + thumbImgDir + "thumb" + filename)
+		} else if imgKind == featImgDir {
+			removeFile(galleryPath + subSite + thumbImgDir + "feat" + filename)
+		}
 	}
 }
 
@@ -92,17 +96,14 @@ func checkSubSites(subSites map[string]*Galleries) {
 
 func checkFiles(files []os.FileInfo, subSite string, featured bool) {
 	for _, file := range files {
-		if checkFile(galleryPath + subSite + thumbImgDir + "thumb" + file.Name()) {
-			if featured {
-				go createImage(galleryPath+subSite+featImgDir+file.Name(), galleryPath+subSite+thumbImgDir+"thumb"+file.Name(), featSize)
-			} else {
-				go createImage(galleryPath+subSite+origImgDir+file.Name(), galleryPath+subSite+thumbImgDir+"thumb"+file.Name(), thumbSize)
-			}
+		if checkFile(galleryPath+subSite+thumbImgDir+"thumb"+file.Name()) && !featured {
+			go createImage(galleryPath+subSite+origImgDir+file.Name(), galleryPath+subSite+thumbImgDir+"thumb"+file.Name(), thumbSize)
+		} else if checkFile(galleryPath+subSite+thumbImgDir+"feat"+file.Name()) && featured {
+			go createImage(galleryPath+subSite+featImgDir+file.Name(), galleryPath+subSite+thumbImgDir+"feat"+file.Name(), featSize)
 		}
 		if checkFile(galleryPath + subSite + prevImgDir + "prev" + file.Name()) {
 			if featured {
 				go createImage(galleryPath+subSite+featImgDir+file.Name(), galleryPath+subSite+prevImgDir+"prev"+file.Name(), prevSize)
-
 			} else {
 				go createImage(galleryPath+subSite+origImgDir+file.Name(), galleryPath+subSite+prevImgDir+"prev"+file.Name(), prevSize)
 			}
