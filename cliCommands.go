@@ -98,7 +98,7 @@ func writeConfig(path string, c Config) {
 	check(err)
 }
 
-func newPrompts(path string) error {
+func newGallery(path string) error {
 	var err error
 	var s string
 	var newData Galleries
@@ -248,9 +248,9 @@ func CliAccess() {
 			Description: "test",
 			Action: func(c *cli.Context) error {
 				if customDir == "" {
-					return newPrompts(getDir())
+					return newGallery(getDir())
 				}
-				return newPrompts(customDir)
+				return newGallery(customDir)
 			},
 		},
 	}
