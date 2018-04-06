@@ -45,6 +45,19 @@
 /*</editor-fold>*/
 
 /*region style classes*/
+h1 {
+    font-family: 'Merriweather Sans', sans-serif;
+    text-transform: uppercase;
+}
+
+.date h4 {
+    font-weight: 100;
+}
+
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
 .button-primary {
     background-color: #000 !important;
     border-color: #000 !important;

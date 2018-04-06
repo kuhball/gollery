@@ -17,7 +17,7 @@
             <div class="grid-sizer"></div>
             <div class="grid-item meta">
                 <h1>{{.Title}}</h1>
-                <h6>{{.Description}}</h6>
+                <h5>{{.Description}}</h5>
             {{ if .Download }}
                 <a class="button button-primary"
                    href="/{{ .Dir.GalleryPath }}{{ .Title }}/{{ .Title }}_images.zip">Download</a>
@@ -28,13 +28,14 @@
         {{ range $key,$image := .Images }}
         {{if ( or (eq $key 0) )}}
             <div class="grid-item date">
-                <h3>{{$image.Date}}</h3>
+                <h4>{{$image.Date}}</h4>
             </div>
         {{end}}
         {{if ( and (ne $key 0))}}
         {{ if ne ($image.Date) (index $.Images (minus $key 1)).Date}}
             <div class="grid-item date">
-                <h3>{{$image.Date}}</h3>
+                <hr>
+                <h4>{{$image.Date}}</h4>
             </div>
         {{end }}
         {{end}}
@@ -72,6 +73,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chocolat/0.4.19/css/chocolat.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Merriweather+Sans:800|Roboto:100,300" >
 <link rel="stylesheet" href="/static/css/custom.css">
 </body>
 
