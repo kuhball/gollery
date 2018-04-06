@@ -178,15 +178,15 @@ func createGalleries(path string) {
 
 	for subsite := range c.Galleries {
 		if checkFile(path + "/" + subsite) {
-			err := os.Mkdir(path+"/"+subsite, 0600)
+			err := os.Mkdir(path+"/"+subsite, 0755)
 			check(err)
-			err = os.Mkdir(path+"/"+subsite+"/img", 0600)
+			err = os.Mkdir(path+"/"+subsite+"/img", 0755)
 			check(err)
-			err = os.Mkdir(path+"/"+subsite+"/featured", 0600)
+			err = os.Mkdir(path+"/"+subsite+"/featured", 0755)
 			check(err)
-			err = os.Mkdir(path+"/"+subsite+"/preview", 0600)
+			err = os.Mkdir(path+"/"+subsite+"/preview", 0755)
 			check(err)
-			err = os.Mkdir(path+"/"+subsite+"/thumbnail", 0600)
+			err = os.Mkdir(path+"/"+subsite+"/thumbnail", 0755)
 			check(err)
 		} else {
 			log.Println(subsite + " structure is already existing.")
