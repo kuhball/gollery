@@ -174,8 +174,6 @@ newTitle:
 func createGalleries(path string) {
 	c := ReadConfig(path+"/config.yaml", false)
 
-	log.Println(c)
-
 	for subsite := range c.Galleries {
 		if checkFile(path + "/" + subsite) {
 			err := os.Mkdir(path+"/"+subsite, 0755)
