@@ -13,6 +13,9 @@ import (
 	"github.com/mholt/archiver"
 )
 
+// variable for image creation tool convert / magick
+var cmd string
+
 // used for zip recreation - changed by watcher event
 var recreate = false
 
@@ -79,15 +82,39 @@ func filterFile(event fsnotify.Event) {
 	}
 }
 
-// This function calls the cli tool magick
-// The input image is loaded and a new output image is created with a given size
+// Check whether magick or convert are available for exec & print version
+// TODO: improve this shit, quick hack, not a nice solution
+func checkImageTool() {
+	localCMD := exec.Command("convert", "-version")
+	out, err := localCMD.CombinedOutput()
+	if err != nil {
+		log.Printf("cmd.Run() failed with %s\n", err)
+		log.Print("convert is unavailable.")
+	} else {
+		fmt.Printf("using convert:\n%s\n", string(out))
+		cmd = "convert"
+		return
+	}
+
+	localCMD = exec.Command("magick", "-version")
+	out, err = localCMD.CombinedOutput()
+	if err != nil {
+		log.Printf("cmd.Run() failed with %s\n", err)
+		log.Print("magick is unavaiable.")
+	} else {
+		fmt.Printf("using magick:\n%s\n", string(out))
+		cmd = "magick"
+		return
+	}
+}
+
+// This function calls the cli tool magick / convert
+// The input image is loaded and a new output image is created with a given size. An error is returned in case of a not valid image.
 // Magick options are adjusted for thumbnails.
 func createImage(input string, output string, size int) {
-	cmd := "magick"
 	args := []string{input, "-define", "jpeg:size=" + strconv.Itoa(size*2) + "x", "-auto-orient", "-quality", "80", "-thumbnail", strconv.Itoa(size) + "x", "-unsharp", "0x.5", output}
-	log.Println(args)
 	if err := exec.Command(cmd, args...).Run(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(os.Stderr, err, input)
 		os.Exit(1)
 	}
 	fmt.Println("Successfully created " + strconv.Itoa(size))

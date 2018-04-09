@@ -236,7 +236,7 @@ func CliAccess() {
 				} else {
 					webPath = filepath.ToSlash(c.String("webpath"))
 				}
-
+				checkImageTool()
 				go initWebServer(GlobConfig.Port)
 				checkSubSites(GlobConfig.Galleries)
 

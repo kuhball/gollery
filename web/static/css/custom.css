@@ -99,4 +99,8 @@ h1 {
     .feature img {
         min-height: 0;
     }
+
+    .date {
+        width: 100%;
+    }
 }
