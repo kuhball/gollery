@@ -1,18 +1,19 @@
 package gollery
 
 import (
-	"go/build"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
-
+	"io"
+	"net/http"
 	"image"
 	_ "image/jpeg" //read jpeg files
 	_ "image/png"  //read png files
 	"time"
 
 	"github.com/xor-gate/goexif2/exif"
+
 )
 
 // Returns the content of a directory on a filesystem.
@@ -36,15 +37,6 @@ func getDir() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	check(err)
 	return filepath.ToSlash(dir)
-}
-
-// Returns the system GO Path.
-func getGoPath() string {
-	gopath := os.Getenv("GOPATH")
-	if gopath == "" {
-		gopath = build.Default.GOPATH
-	}
-	return filepath.ToSlash(gopath)
 }
 
 // Simple error check and log in case of != nil.
@@ -71,10 +63,44 @@ func returnImageData(path string) (string, time.Time, float32) {
 	check(err)
 
 	x, err := exif.Decode(f)
-	check(err)
+	var tm time.Time
+	if err != nil {
+		log.Print("Not able to read exif Data of " + path + ", please check! (" + err.Error() + ")")
+		log.Print("Using current Date: " + time.Now().Format("Mon, 2 Jan 2006"))
+		tm = time.Now()
+	} else {
+		tm, err = x.DateTime()
+		check(err)
+	}
 
-	tm, err := x.DateTime()
-	check(err)
+
 
 	return tm.Format("Mon, 2 Jan 2006"), tm, float32(size.Width) / float32(size.Height)
+}
+
+// DownloadFile will download a url to a local file. It's efficient because it will
+// write as it downloads and not load the whole file into memory.
+func downloadFile(filepath string, url string) error {
+
+	// Create the file
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Write the body to file
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

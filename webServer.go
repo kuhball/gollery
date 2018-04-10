@@ -82,7 +82,7 @@ func (fs justFilesFilesystem) Open(name string) (http.File, error) {
 // Iterates over all galleries within the global config and registers a handler for each gallery
 // Starts the http server on the configured port in the config.yaml
 // TODO: register new gallery while service is running
-// TODO: HTTP2 PUSH
+// TODO: HTTP2 PUSH - only available with TLS
 func initWebServer(port string) {
 	go initTemplate()
 

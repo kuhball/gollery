@@ -22,6 +22,7 @@ var recreate = false
 // initialize a new fsnotify watcher
 // watcher calls filterfile() in case of an event
 // the origImgDir and featImgDir from all galleries are added to the watcher
+// TODO: Check for new galleries that are not in config / reload config file
 func watchFile(galleries map[string]*Gallery) {
 	watcher, err := fsnotify.NewWatcher()
 	check(err)
@@ -33,7 +34,6 @@ func watchFile(galleries map[string]*Gallery) {
 		for {
 			select {
 			case event := <-watcher.Events:
-				log.Println("event:", event)
 				filterFile(event)
 				recreate = true
 			case err = <-watcher.Errors:
@@ -66,19 +66,23 @@ func filterFile(event fsnotify.Event) {
 
 	if event.Op.String() == "CREATE" {
 		if imgKind == origImgDir {
-			go createImage(event.Name, galleryPath+gallery+thumbImgDir+"thumb"+filename, thumbSize)
+			createImage(event.Name, galleryPath+gallery+thumbImgDir+"thumb"+filename, thumbSize)
+			GlobConfig = appendImage(GlobConfig, gallery[:len(gallery)-1], filename, false)
 		} else if imgKind == featImgDir {
-			go createImage(event.Name, galleryPath+gallery+thumbImgDir+"feat"+filename, featSize)
+			createImage(event.Name, galleryPath+gallery+thumbImgDir+"feat"+filename, featSize)
+			GlobConfig = appendImage(GlobConfig, gallery[:len(gallery)-1], filename, true)
 		}
 		go createImage(event.Name, galleryPath+gallery+prevImgDir+"prev"+filename, prevSize)
+		GlobConfig = sortImages(GlobConfig, gallery[:len(gallery)-1])
 	} else if event.Op.String() == "REMOVE" {
-		log.Print(filename)
+		log.Print("Removing Image " + filename)
 		removeFile(galleryPath + gallery + prevImgDir + "prev" + filename)
 		if imgKind == origImgDir {
 			removeFile(galleryPath + gallery + thumbImgDir + "thumb" + filename)
 		} else if imgKind == featImgDir {
 			removeFile(galleryPath + gallery + thumbImgDir + "feat" + filename)
 		}
+		GlobConfig.Galleries[gallery[:len(gallery)-1]] = deleteImage(GlobConfig.Galleries[gallery[:len(gallery)-1]],filename)
 	}
 }
 
@@ -88,7 +92,6 @@ func checkImageTool() {
 	localCMD := exec.Command("convert", "-version")
 	_, err := localCMD.CombinedOutput()
 	if err != nil {
-		//log.Printf("cmd.Run() failed with %s\n", err)
 		log.Print("convert is unavailable.")
 	} else {
 		fmt.Printf("using convert\n")
@@ -99,7 +102,6 @@ func checkImageTool() {
 	localCMD = exec.Command("magick", "-version")
 	_, err = localCMD.CombinedOutput()
 	if err != nil {
-		//log.Printf("cmd.Run() failed with %s\n", err)
 		log.Print("magick is unavaiable.")
 	} else {
 		fmt.Printf("using magick\n")
@@ -118,7 +120,7 @@ func createImage(input string, output string, size int) {
 		fmt.Fprintln(os.Stderr, err, input)
 		os.Exit(1)
 	}
-	fmt.Println("Successfully created " + strconv.Itoa(size))
+	fmt.Println("Successfully created " + strconv.Itoa(size) + " - " + output)
 }
 
 // Calls checkFiles for every galleries orig and feat images
@@ -152,10 +154,17 @@ func checkFiles(files []os.FileInfo, gallery string, featured bool) {
 			}
 		}
 	}
+	if featured {
+		log.Print("Featured thumbnails and previews for " + gallery + " are available.")
+	} else {
+		log.Print("Normal thumbnails and previews for " + gallery + " are available.")
+	}
+
 }
 
 // Creates a zip file at the output location with every given path within path[]
 func addZip(output string, path []string) {
 	err := archiver.Zip.Make(output, path)
 	check(err)
+	log.Print("New zip file created.")
 }

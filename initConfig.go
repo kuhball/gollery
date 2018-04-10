@@ -81,11 +81,13 @@ func ReadConfig(f string, initialize bool) Config {
 
 	err = yaml.Unmarshal(source, &c)
 	check(err)
+
 	if initialize {
 		for gallery := range c.Galleries {
 			initImages(c, gallery)
 		}
 	}
+	log.Print("Config initialized.")
 
 	return c
 }
@@ -95,13 +97,39 @@ func ReadConfig(f string, initialize bool) Config {
 // Write image data into given config struct / gallery struct / image struct
 func initImages(c Config, gallery string) Config {
 	for _, orig := range readDir(gallery + "/" + origImgDir) {
-		date, tm, ratio := returnImageData(gallery + "/" + origImgDir + orig.Name())
-		c.Galleries[gallery].Images = append(c.Galleries[gallery].Images, Image{Name: orig.Name(), Date: date, Time: tm, Feature: false, Ratio: ratio})
+		c = appendImage(c, gallery, orig.Name(), false)
 	}
 	for _, orig := range readDir(gallery + "/" + featImgDir) {
-		date, tm, ratio := returnImageData(gallery + "/" + featImgDir + "/" + orig.Name())
-		c.Galleries[gallery].Images = append(c.Galleries[gallery].Images, Image{Name: orig.Name(), Date: date, Time: tm, Feature: true, Ratio: ratio})
+		c = appendImage(c, gallery, orig.Name(), true)
 	}
+	c = sortImages(c, gallery)
+	return c
+}
+
+func appendImage(c Config, gallery string, name string, feature bool) Config {
+	if feature {
+		date, tm, ratio := returnImageData(gallery + "/" + featImgDir + name)
+		c.Galleries[gallery].Images = append(c.Galleries[gallery].Images, Image{Name: name, Date: date, Time: tm, Feature: true, Ratio: ratio})
+	} else {
+		date, tm, ratio := returnImageData(gallery + "/" + origImgDir + name)
+		c.Galleries[gallery].Images = append(c.Galleries[gallery].Images, Image{Name: name, Date: date, Time: tm, Feature: false, Ratio: ratio})
+	}
+	return c
+}
+
+func deleteImage(c *Gallery, name string) *Gallery {
+	var i int
+	for p, v := range c.Images {
+		if v.Name == name {
+			i = p
+			break
+		}
+	}
+	c.Images = append(c.Images[:i], c.Images[i+1:]...)
+	return c
+}
+
+func sortImages(c Config, gallery string) Config {
 	sort.SliceStable(c.Galleries[gallery].Images, func(i, j int) bool {
 		return c.Galleries[gallery].Images[i].Time.Before(c.Galleries[gallery].Images[j].Time)
 	})

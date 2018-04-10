@@ -2,12 +2,10 @@
 package gollery
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
-	"strconv"
 
 	"github.com/manifoldco/promptui"
 	"github.com/urfave/cli"
@@ -18,7 +16,6 @@ import (
 // Checks whether a custom path was specified and uses current path if not.
 // Creates a custom_css folder, the config.yaml with a example gallery and the corresponding file structure
 // TODO: import the custom_css files into html template
-// TODO: improve all return strings
 func initGollery(path string) error {
 	if path == "" {
 		pathSelect := promptui.Select{
@@ -26,7 +23,7 @@ func initGollery(path string) error {
 			Items: []string{"yep, go!", "nop!"},
 		}
 		enterPath := promptui.Prompt{
-			Label: "Please enter a custom Path (full)",
+			Label: "Please enter a custom Path (full or starting at the current location)",
 		}
 
 		if _, s, err := pathSelect.Run(); err != nil {
@@ -52,13 +49,27 @@ func initGollery(path string) error {
 	if checkFile(path) {
 		err := os.Mkdir(path, 0600)
 		check(err)
-	} else {
-		log.Println("Directory is already existing.")
+		log.Print("Created new Directory " + path + ".")
+	}
+
+	emptyPath := promptui.Select{
+		Label: "The provided folder is not empty. Do you want to continue?",
+		Items: []string{"yep, go!", "nop!"},
+	}
+
+	if len(readDir(path)) != 0 {
+		if _, s, err := emptyPath.Run(); err != nil {
+			fmt.Printf("Prompt failed %v\n", err)
+			return err
+		} else if s == "nop!" {
+			return nil
+		}
 	}
 
 	if checkFile("custom_css") {
 		err := os.Mkdir(path+"/custom_css", 0600)
 		check(err)
+		log.Print("Created folder custom_css.")
 	} else {
 		log.Println("costum_css folder is already existing.")
 	}
@@ -74,14 +85,33 @@ func initGollery(path string) error {
 			return err
 		} else if s == "yep, go!" {
 			writeConfig(path, initExampleConfig())
+			log.Print("Successfully overwritten config.yaml.")
 		} else if s == "nop!" {
+			log.Print("Old config.yaml wasn't changed.")
 			return nil
 		}
 	} else {
 		writeConfig(path, initExampleConfig())
+		log.Print("Created new config.yaml.")
 	}
 
 	createGalleries(path)
+
+	genImages := promptui.Select{
+		Label: "Do you want some example Images?",
+		Items: []string{"yep, go!", "nop!"},
+	}
+
+	if _, s, err := genImages.Run(); err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return err
+	} else if s == "yep, go!" {
+		downloadFile(galleryPath + "example/" + origImgDir + "example1.jpg","https://unsplash.com/photos/H4Sv_zRXBos/download?force=true")
+		downloadFile(galleryPath + "example/" + origImgDir + "example2.jpg","https://unsplash.com/photos/bF9kRBJhMpE/download?force=true")
+		downloadFile(galleryPath + "example/" + origImgDir + "example3.jpg","https://unsplash.com/photos/XqMjjuQuyZQ/download?force=true")
+	}
+
+	log.Print("New gollery was created successfully 👍🏻")
 
 	return nil
 }
@@ -105,14 +135,11 @@ func writeConfig(path string, c Config) {
 	check(err)
 }
 
-
 // Function creates a new gallery within an existing root folder and config.yaml
 // Reads the existing config file, asks for Title (unique), Description and Download (bool)
 // Writes new config and generates folder structure for new gallery
-// TODO: only generate new gallery structure, ignore existing galleries
 func newGallery(path string) error {
 	var err error
-	var s string
 	var newData Gallery
 
 	c := ReadConfig(path+"/config.yaml", false)
@@ -127,7 +154,7 @@ func newGallery(path string) error {
 
 	download := promptui.Select{
 		Label: "Compress all images automatically and provide a download button?",
-		Items: []bool{true, false},
+		Items: []string{"yep, go!", "nop!"},
 	}
 
 newTitle:
@@ -151,12 +178,13 @@ newTitle:
 		return err
 	}
 
-	if _, s, err = download.Run(); err != nil {
+	if _, s, err := download.Run(); err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
 		return err
-	}
-	if newData.Download, err = strconv.ParseBool(s); err != nil {
-		fmt.Printf("Boolean convertation failed %v\n", err)
+	} else if s == "yep, go!" {
+		newData.Download = true
+	} else if s == "nop!" {
+		newData.Download = false
 	}
 
 	c.Galleries[newData.Title] = &newData
@@ -169,7 +197,6 @@ newTitle:
 
 // Reads config.yaml from filesystem
 // Checks whether new gallery name already has a folder -> aborts if yes
-// TODO: check whether subfolders exist
 // Create all necessary subfolders for the gallery
 func createGalleries(path string) {
 	c := ReadConfig(path+"/config.yaml", false)
@@ -178,18 +205,60 @@ func createGalleries(path string) {
 		if checkFile(path + "/" + subsite) {
 			err := os.Mkdir(path+"/"+subsite, 0755)
 			check(err)
-			err = os.Mkdir(path+"/"+subsite+"/img", 0755)
+			log.Print("Created new folder " + subsite + ".")
+		}
+		if checkFile(path + "/" + subsite + "/img") {
+			err := os.Mkdir(path+"/"+subsite+"/img", 0755)
 			check(err)
-			err = os.Mkdir(path+"/"+subsite+"/featured", 0755)
+			log.Print("Created new folder " + subsite + "/img .")
+		}
+		if checkFile(path + "/" + subsite + "/featured") {
+			err := os.Mkdir(path+"/"+subsite+"/featured", 0755)
 			check(err)
-			err = os.Mkdir(path+"/"+subsite+"/preview", 0755)
+			log.Print("Created new folder " + subsite + "/featured .")
+
+		}
+		if checkFile(path + "/" + subsite + "/preview") {
+			err := os.Mkdir(path+"/"+subsite+"/preview", 0755)
 			check(err)
-			err = os.Mkdir(path+"/"+subsite+"/thumbnail", 0755)
+			log.Print("Created new folder " + subsite + "/preview .")
+
+		}
+		if checkFile(path + "/" + subsite + "/thumbnail") {
+			err := os.Mkdir(path+"/"+subsite+"/thumbnail", 0755)
 			check(err)
-		} else {
-			log.Println(subsite + " structure is already existing.")
+			log.Print("Created new folder " + subsite + "/thumbnail .")
+
 		}
 	}
+}
+
+func startGollery(c *cli.Context, directory string) error {
+	if c.Bool("webserver") && c.Bool("filewatcher") {
+		log.Fatal("flag combination is not allowed")
+	}
+
+	if directory == "" {
+		GlobConfig = ReadConfig(getDir()+"/config.yaml", true)
+	} else {
+		GlobConfig = ReadConfig(directory+"/config.yaml", true)
+	}
+
+	if c.Bool("webserver") && !c.Bool("filewatcher") {
+		initWebServer(GlobConfig.Port)
+	}
+	if !c.Bool("webserver") && c.Bool("filewatcher") {
+		go checkImageTool()
+		checkSubSites(GlobConfig.Galleries)
+		watchFile(GlobConfig.Galleries)
+	}
+	if !c.Bool("webserver") && !c.Bool("filewatcher") {
+		go initWebServer(GlobConfig.Port)
+		checkImageTool()
+		checkSubSites(GlobConfig.Galleries)
+		watchFile(GlobConfig.Galleries)
+	}
+	return nil
 }
 
 // CliAccess - Main function for all functionality
@@ -219,22 +288,7 @@ func CliAccess() {
 			Usage:       "Start gollery as a daemon",
 			Description: "moin",
 			Action: func(c *cli.Context) error {
-				if c.Bool("webserver") && c.Bool("filewatcher") {
-					return errors.New("flag combination is not allowed")
-				}
-
-				if directory == "" {
-					GlobConfig = ReadConfig(getDir()+"/config.yaml", true)
-				} else {
-					GlobConfig = ReadConfig(directory+"/config.yaml", true)
-				}
-
-				go checkImageTool()
-				go initWebServer(GlobConfig.Port)
-				checkSubSites(GlobConfig.Galleries)
-
-				watchFile(GlobConfig.Galleries)
-				return nil
+				return startGollery(c, directory)
 			},
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "directory, d", Usage: "root path for gollery", Destination: &directory},
