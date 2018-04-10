@@ -1,4 +1,4 @@
-// TODO: improve all return strings
+//Package gollery - main package of the application with all the logic
 package gollery
 
 import (
@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 	"strconv"
 
 	"github.com/manifoldco/promptui"
@@ -19,6 +18,7 @@ import (
 // Checks whether a custom path was specified and uses current path if not.
 // Creates a custom_css folder, the config.yaml with a example gallery and the corresponding file structure
 // TODO: import the custom_css files into html template
+// TODO: improve all return strings
 func initGollery(path string) error {
 	if path == "" {
 		pathSelect := promptui.Select{
@@ -192,7 +192,7 @@ func createGalleries(path string) {
 	}
 }
 
-// Main function for all functionality
+// CliAccess - Main function for all functionality
 // provides all cli arguments via cli plugin - read doc for more information
 func CliAccess() {
 	var directory string
@@ -229,12 +229,7 @@ func CliAccess() {
 					GlobConfig = ReadConfig(directory+"/config.yaml", true)
 				}
 
-				if c.String("webpath") == "" {
-					webPath = getGoPath() + "/src/github.com/scouball/gollery/web/"
-				} else {
-					webPath = filepath.ToSlash(c.String("webpath"))
-				}
-				checkImageTool()
+				go checkImageTool()
 				go initWebServer(GlobConfig.Port)
 				checkSubSites(GlobConfig.Galleries)
 
@@ -243,7 +238,6 @@ func CliAccess() {
 			},
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "directory, d", Usage: "root path for gollery", Destination: &directory},
-				cli.StringFlag{Name: "webpath, p", Usage: "custom location for web folder (needed for docker)"},
 				cli.BoolFlag{Name: "webserver, w", Usage: "only start webserver"},
 				cli.BoolFlag{Name: "filewatcher, f", Usage: "only start filewatcher"},
 			},

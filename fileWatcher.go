@@ -86,26 +86,27 @@ func filterFile(event fsnotify.Event) {
 // TODO: improve this shit, quick hack, not a nice solution
 func checkImageTool() {
 	localCMD := exec.Command("convert", "-version")
-	out, err := localCMD.CombinedOutput()
+	_, err := localCMD.CombinedOutput()
 	if err != nil {
-		log.Printf("cmd.Run() failed with %s\n", err)
+		//log.Printf("cmd.Run() failed with %s\n", err)
 		log.Print("convert is unavailable.")
 	} else {
-		fmt.Printf("using convert:\n%s\n", string(out))
+		fmt.Printf("using convert\n")
 		cmd = "convert"
 		return
 	}
 
 	localCMD = exec.Command("magick", "-version")
-	out, err = localCMD.CombinedOutput()
+	_, err = localCMD.CombinedOutput()
 	if err != nil {
-		log.Printf("cmd.Run() failed with %s\n", err)
+		//log.Printf("cmd.Run() failed with %s\n", err)
 		log.Print("magick is unavaiable.")
 	} else {
-		fmt.Printf("using magick:\n%s\n", string(out))
+		fmt.Printf("using magick\n")
 		cmd = "magick"
 		return
 	}
+	log.Fatal("Magick and convert are not available. Please install one of them.")
 }
 
 // This function calls the cli tool magick / convert

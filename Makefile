@@ -14,11 +14,15 @@ install:
 	go get -u github.com/go-bindata/go-bindata/...
 	go get -u github.com/elazarl/go-bindata-assetfs/...
 
+#issue with go-bindata-assetfs - debug not working
+# TODO: Debug debug ;)
 build-dev:
 	@echo "Building..."
+	go-bindata-assetfs -debug -pkg gollery -o assets.go web/...
 	go build -o $(GOLLERY_BINARY) cmd/gollery/main.go
 build:
 	@echo "Building..."
+	go-bindata-assetfs -pkg gollery -o assets.go web/...
 	go build -o $(GOLLERY_BINARY) cmd/gollery/main.go
 run:
 	@echo "Running the server..."

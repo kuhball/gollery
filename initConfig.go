@@ -18,17 +18,17 @@ const thumbSize = 396
 const featSize = 796
 const prevSize = 1080
 
+// GlobConfig contains the read config from the config.yaml
 var GlobConfig Config
-var webPath string
 var galleryPath = getDir() + "/"
 
-// Struct for the config.yaml with Port and all the galleries.
+// Config Struct for the config.yaml with Port and all the galleries.
 type Config struct {
 	Port      string
 	Galleries map[string]*Gallery
 }
 
-// Struct for a gallery within the config struct.
+// Gallery Struct for a gallery within the config struct.
 type Gallery struct {
 	Title       string
 	Description string
@@ -37,7 +37,7 @@ type Gallery struct {
 	Dir         dir     `yaml:"-"`
 }
 
-// Struct for image within gallery struct.
+// Image Struct for image within gallery struct.
 type Image struct {
 	Name    string
 	Date    string
@@ -66,7 +66,7 @@ func initDir() dir {
 	}
 }
 
-// Checks whether provided config path is valid
+// ReadConfig - Checks whether provided config path is valid
 // Read & unmarshal config.yaml
 // Call initImages for all galleries from the config file
 // TODO: add support for json config file

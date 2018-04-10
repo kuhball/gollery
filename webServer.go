@@ -18,15 +18,6 @@ type justFilesFilesystem struct {
 
 // Read the html template from file into global variable and add a minus function.
 // (only loaded once per start, not per request)
-// TODO: integrate template into binary
-//func initTemplate() {
-//	var err error
-//	t, err = template.New("gallery.html").Funcs(template.FuncMap{
-//		"minus": func(a, b int) int { return a - b },
-//	}).ParseFiles(webPath + "template/gallery.html")
-//	check(err)
-//}
-
 func initTemplate() {
 	var err error
 	t, err = bTemplate.New("gallery.html", Asset).Funcs(bTemplate.FuncMap{
@@ -37,7 +28,6 @@ func initTemplate() {
 	}
 }
 
-//
 func galleryHandler() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		title := strings.Replace(r.URL.Path, "/", "", 2)
@@ -55,18 +45,6 @@ func galleryHandler() http.HandlerFunc {
 		check(err)
 	})
 }
-
-// Handler for static files
-// Only displays files, no folders
-//func staticHandler(w http.ResponseWriter, r *http.Request) {
-//	path := webPath + "/" + r.URL.Path
-//	if f, err := os.Stat(path); err == nil && !f.IsDir() {
-//		http.ServeFile(w, r, filepath.FromSlash(path))
-//		return
-//	}
-//
-//	http.NotFound(w, r)
-//}
 
 // Handler for all the image files within the gallery root folder
 // Only displays files, no folders or config files
@@ -91,6 +69,7 @@ func (fs justFilesFilesystem) Open(name string) (http.File, error) {
 	}
 
 	stat, err := f.Stat()
+	check(err)
 	if stat.IsDir() {
 		return nil, os.ErrNotExist
 	}
@@ -103,6 +82,7 @@ func (fs justFilesFilesystem) Open(name string) (http.File, error) {
 // Iterates over all galleries within the global config and registers a handler for each gallery
 // Starts the http server on the configured port in the config.yaml
 // TODO: register new gallery while service is running
+// TODO: HTTP2 PUSH
 func initWebServer(port string) {
 	go initTemplate()
 

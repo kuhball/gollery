@@ -1,10 +1,14 @@
 # build stage
 FROM golang:alpine as build-env
 
-COPY ./ /go/src/github.com/scouball/gollery
-WORKDIR /go/src/github.com/scouball/gollery/cmd/gollery
+RUN apk --update add make curl git
+RUN curl -fsSL -o /usr/local/bin/dep https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 && chmod +x /usr/local/bin/dep
 
-RUN go build -o /go/bin/gollery
+COPY ./ /go/src/github.com/scouball/gollery
+WORKDIR /go/src/github.com/scouball/gollery
+
+RUN make install
+RUN make build
 
 # final stage
 FROM alpine
@@ -14,6 +18,6 @@ COPY --from=build-env /go/src/github.com/scouball/gollery/web /web/
 
 RUN apk --update add imagemagick
 
-ENTRYPOINT gollery start -p /web/
+ENTRYPOINT gollery start
 
 EXPOSE 8080

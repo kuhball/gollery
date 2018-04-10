@@ -31,7 +31,7 @@
 
 [[constraint]]
   name = "github.com/manifoldco/promptui"
-  version = "0.2.1"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/mholt/archiver"

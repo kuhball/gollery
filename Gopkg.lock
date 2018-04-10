@@ -9,6 +9,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/arschles/go-bindata-html-template"
+  packages = ["."]
+  revision = "839a6918b9ff535f95246ef0f43edfdb4ed186be"
+
+[[projects]]
+  branch = "master"
   name = "github.com/chzyer/readline"
   packages = ["."]
   revision = "f6d7a1f6fbf35bbf9beb80dc63c56a29dcfb759f"
@@ -25,6 +31,12 @@
     "internal/prefix"
   ]
   revision = "cc9eb1d7ad760af14e8f918698f745e80377af4f"
+
+[[projects]]
+  name = "github.com/elazarl/go-bindata-assetfs"
+  packages = ["."]
+  revision = "30f82fa23fd844bd5bb1e5f216db87fd77b5eb43"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -48,14 +60,14 @@
   revision = "d14193dfc626125c831501c1c42340b4248e1f5a"
 
 [[projects]]
+  branch = "master"
   name = "github.com/manifoldco/promptui"
   packages = [
     ".",
     "list",
     "screenbuf"
   ]
-  revision = "f6438f6153008ee1b9ba5446d5333bbe63b622b7"
-  version = "v0.2.1"
+  revision = "c0c0d3afc6a03bcb5c1df10b70b862a650db9f9b"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -122,6 +134,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e2339c39d142a5c02bb3af96e12480d6a20219273935da44394b8f603e1bb990"
+  inputs-digest = "4502e59ca9be7cf7e68ad0212de030637aff37ae57c3e5aaa72bf73000b30261"
   solver-name = "gps-cdcl"
   solver-version = 1
