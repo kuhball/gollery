@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/mholt/archiver"
 	"time"
 )
 
@@ -41,14 +40,11 @@ func watchFile(galleries map[string]*Gallery) {
 				filterFile(event)
 			case err = <-watcher.Errors:
 				log.Println("error:", err)
-			case <-done:
-				log.Print("watcher terminanted.")
-				return
 			}
 		}
 	}()
 
-	err = watcher.Add(galleryPath)
+	err = watcher.Add(galleryPath + "config.yaml")
 	check(err)
 
 	for gallery := range galleries {
@@ -97,6 +93,7 @@ func filterFile(event fsnotify.Event) {
 					if gallery.Title != GlobConfig.Galleries[index].Title {
 						createGalleryHandle(gallery.Title)
 					}
+					addZip(newConfig, gallery.Title)
 				}
 				gallery.Dir = initDir()
 			}
@@ -162,8 +159,7 @@ func checkSubSites(galleries map[string]*Gallery) {
 		checkFiles(readDir(galleryPath+gallery+origImgDir), gallery, false)
 		checkFiles(readDir(galleryPath+gallery+featImgDir), gallery, true)
 
-		folders := []string{galleryPath + gallery + origImgDir, galleryPath + gallery + featImgDir}
-		addZip(galleryPath+gallery+strings.Replace(gallery, "/", "", 1)+"_images.zip", folders)
+		addZip(GlobConfig, strings.Replace(gallery, "/", "", 1))
 	}
 }
 
@@ -190,11 +186,4 @@ func checkFiles(files []os.FileInfo, gallery string, featured bool) {
 		log.Print("Normal thumbnails and previews for " + gallery + " are available.")
 	}
 
-}
-
-// Creates a zip file at the output location with every given path within path[]
-func addZip(output string, path []string) {
-	err := archiver.Zip.Make(output, path)
-	check(err)
-	log.Print("New zip file created.")
 }

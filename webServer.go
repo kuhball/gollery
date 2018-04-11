@@ -33,8 +33,7 @@ func galleryHandler() http.HandlerFunc {
 		title := strings.Replace(r.URL.Path, "/", "", 2)
 
 		if recreate {
-			folders := []string{filepath.FromSlash(galleryPath + title + "/" + origImgDir), filepath.FromSlash(galleryPath + title + "/" + featImgDir)}
-			addZip(filepath.FromSlash(galleryPath+title+"/"+title+"_images.zip"), folders)
+			addZip(GlobConfig, title)
 			GlobConfig.Galleries[title].Images = GlobConfig.Galleries[title].Images[:0]
 			initImages(GlobConfig, title)
 			recreate = false

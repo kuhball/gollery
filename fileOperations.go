@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/xor-gate/goexif2/exif"
+	"github.com/mholt/archiver"
 )
 
 // Returns the content of a directory on a filesystem.
@@ -72,8 +73,6 @@ func returnImageData(path string) (string, time.Time, float32) {
 		check(err)
 	}
 
-
-
 	return tm.Format("Mon, 2 Jan 2006"), tm, float32(size.Width) / float32(size.Height)
 }
 
@@ -102,4 +101,18 @@ func downloadFile(filepath string, url string) error {
 	}
 
 	return nil
+}
+
+// Creates a zip file at the output location with every given path within path[]
+func addZip(c Config, gallery string) {
+	if c.Galleries[gallery].Download {
+		folders := []string{filepath.FromSlash(galleryPath + gallery + "/" + origImgDir), filepath.FromSlash(galleryPath + gallery + "/" + featImgDir)}
+		err := archiver.Zip.Make(filepath.FromSlash(galleryPath+gallery+"/"+gallery+"_images.zip"), folders)
+		check(err)
+		log.Print("New zip file created.")
+	} else {
+		if !checkFile(filepath.FromSlash(galleryPath + gallery + "/" + gallery + "_images.zip")) {
+			removeFile(filepath.FromSlash(galleryPath + gallery + "/" + gallery + "_images.zip"))
+		}
+	}
 }
