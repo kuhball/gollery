@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/xor-gate/goexif2/exif"
-
 )
 
 // Returns the content of a directory on a filesystem.

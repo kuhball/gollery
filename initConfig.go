@@ -21,6 +21,7 @@ const prevSize = 1080
 // GlobConfig contains the read config from the config.yaml
 var GlobConfig Config
 var galleryPath = getDir() + "/"
+var configPath string
 
 // Config Struct for the config.yaml with Port and all the galleries.
 type Config struct {

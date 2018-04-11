@@ -11,6 +11,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/mholt/archiver"
+	"time"
 )
 
 // variable for image creation tool convert / magick
@@ -19,14 +20,17 @@ var cmd string
 // used for zip recreation - changed by watcher event
 var recreate = false
 
+var watcher *fsnotify.Watcher
+
+var configWriteTime = time.Now()
+
 // initialize a new fsnotify watcher
 // watcher calls filterfile() in case of an event
 // the origImgDir and featImgDir from all galleries are added to the watcher
-// TODO: Check for new galleries that are not in config / reload config file
 func watchFile(galleries map[string]*Gallery) {
-	watcher, err := fsnotify.NewWatcher()
+	var err error
+	watcher, err = fsnotify.NewWatcher()
 	check(err)
-
 	defer watcher.Close()
 
 	done := make(chan bool)
@@ -35,12 +39,17 @@ func watchFile(galleries map[string]*Gallery) {
 			select {
 			case event := <-watcher.Events:
 				filterFile(event)
-				recreate = true
 			case err = <-watcher.Errors:
 				log.Println("error:", err)
+			case <-done:
+				log.Print("watcher terminanted.")
+				return
 			}
 		}
 	}()
+
+	err = watcher.Add(galleryPath)
+	check(err)
 
 	for gallery := range galleries {
 		err = watcher.Add(galleryPath + gallery + "/" + origImgDir)
@@ -74,6 +83,26 @@ func filterFile(event fsnotify.Event) {
 		}
 		go createImage(event.Name, galleryPath+gallery+prevImgDir+"prev"+filename, prevSize)
 		GlobConfig = sortImages(GlobConfig, gallery[:len(gallery)-1])
+		recreate = true
+	} else if event.Op.String() == "WRITE" && filename == "config.yaml" {
+		if duration := time.Since(configWriteTime); duration.Seconds() > time.Second.Seconds()*3 {
+			log.Print("Reading changes from config.yaml.")
+			newConfig := ReadConfig(configPath, true)
+			for index, gallery := range newConfig.Galleries {
+				if gallery != GlobConfig.Galleries[index] {
+					err := watcher.Add(galleryPath + gallery.Title + "/" + origImgDir)
+					check(err)
+					err = watcher.Add(galleryPath + gallery.Title + "/" + featImgDir)
+					check(err)
+					if gallery.Title != GlobConfig.Galleries[index].Title {
+						createGalleryHandle(gallery.Title)
+					}
+				}
+				gallery.Dir = initDir()
+			}
+			GlobConfig = newConfig
+			configWriteTime = time.Now()
+		}
 	} else if event.Op.String() == "REMOVE" {
 		log.Print("Removing Image " + filename)
 		removeFile(galleryPath + gallery + prevImgDir + "prev" + filename)
@@ -82,7 +111,8 @@ func filterFile(event fsnotify.Event) {
 		} else if imgKind == featImgDir {
 			removeFile(galleryPath + gallery + thumbImgDir + "feat" + filename)
 		}
-		GlobConfig.Galleries[gallery[:len(gallery)-1]] = deleteImage(GlobConfig.Galleries[gallery[:len(gallery)-1]],filename)
+		GlobConfig.Galleries[gallery[:len(gallery)-1]] = deleteImage(GlobConfig.Galleries[gallery[:len(gallery)-1]], filename)
+		recreate = true
 	}
 }
 

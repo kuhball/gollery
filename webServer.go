@@ -6,8 +6,8 @@ import (
 	"log"
 	"strings"
 	"path/filepath"
-	"github.com/NYTimes/gziphandler"
 	bTemplate "github.com/arschles/go-bindata-html-template"
+	"github.com/NYTimes/gziphandler"
 )
 
 var t *bTemplate.Template
@@ -77,11 +77,15 @@ func (fs justFilesFilesystem) Open(name string) (http.File, error) {
 	return f, nil
 }
 
+func createGalleryHandle(subSite string) {
+	GlobConfig.Galleries[subSite].Dir = initDir()
+	http.Handle("/"+subSite, gziphandler.GzipHandler(galleryHandler()))
+}
+
 // Initializes the HTML template
 // Registers static, image Handler
 // Iterates over all galleries within the global config and registers a handler for each gallery
 // Starts the http server on the configured port in the config.yaml
-// TODO: register new gallery while service is running
 // TODO: HTTP2 PUSH - only available with TLS
 func initWebServer(port string) {
 	go initTemplate()
@@ -91,8 +95,7 @@ func initWebServer(port string) {
 	http.HandleFunc("/image/", imageHandler)
 
 	for subSite := range GlobConfig.Galleries {
-		GlobConfig.Galleries[subSite].Dir = initDir()
-		http.Handle("/"+subSite, gziphandler.GzipHandler(galleryHandler()))
+		createGalleryHandle(subSite)
 	}
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))

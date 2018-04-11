@@ -106,9 +106,9 @@ func initGollery(path string) error {
 		fmt.Printf("Prompt failed %v\n", err)
 		return err
 	} else if s == "yep, go!" {
-		downloadFile(galleryPath + "example/" + origImgDir + "example1.jpg","https://unsplash.com/photos/H4Sv_zRXBos/download?force=true")
-		downloadFile(galleryPath + "example/" + origImgDir + "example2.jpg","https://unsplash.com/photos/bF9kRBJhMpE/download?force=true")
-		downloadFile(galleryPath + "example/" + origImgDir + "example3.jpg","https://unsplash.com/photos/XqMjjuQuyZQ/download?force=true")
+		downloadFile(galleryPath+"example/"+origImgDir+"example1.jpg", "https://unsplash.com/photos/H4Sv_zRXBos/download?force=true")
+		downloadFile(galleryPath+"example/"+origImgDir+"example2.jpg", "https://unsplash.com/photos/bF9kRBJhMpE/download?force=true")
+		downloadFile(galleryPath+"example/"+origImgDir+"example3.jpg", "https://unsplash.com/photos/XqMjjuQuyZQ/download?force=true")
 	}
 
 	log.Print("New gollery was created successfully 👍🏻")
@@ -239,10 +239,12 @@ func startGollery(c *cli.Context, directory string) error {
 	}
 
 	if directory == "" {
-		GlobConfig = ReadConfig(getDir()+"/config.yaml", true)
+		configPath = getDir() + "/config.yaml"
 	} else {
-		GlobConfig = ReadConfig(directory+"/config.yaml", true)
+		configPath = directory + "/config.yaml"
 	}
+
+	GlobConfig = ReadConfig(configPath, true)
 
 	if c.Bool("webserver") && !c.Bool("filewatcher") {
 		initWebServer(GlobConfig.Port)
