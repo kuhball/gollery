@@ -76,8 +76,8 @@ func (fs justFilesFilesystem) Open(name string) (http.File, error) {
 	return f, nil
 }
 
-func createGalleryHandle(subSite string) {
-	GlobConfig.Galleries[subSite].Dir = initDir()
+func createGalleryHandle(c Config, subSite string) {
+	c.Galleries[subSite].Dir = initDir()
 	http.Handle("/"+subSite, gziphandler.GzipHandler(galleryHandler()))
 }
 
@@ -94,7 +94,7 @@ func initWebServer(port string) {
 	http.HandleFunc("/image/", imageHandler)
 
 	for subSite := range GlobConfig.Galleries {
-		createGalleryHandle(subSite)
+		createGalleryHandle(GlobConfig, subSite)
 	}
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))

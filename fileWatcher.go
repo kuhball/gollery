@@ -84,14 +84,19 @@ func filterFile(event fsnotify.Event) {
 		if duration := time.Since(configWriteTime); duration.Seconds() > time.Second.Seconds()*3 {
 			log.Print("Reading changes from config.yaml.")
 			newConfig := ReadConfig(configPath, true)
-			for index, gallery := range newConfig.Galleries {
-				if gallery != GlobConfig.Galleries[index] {
-					err := watcher.Add(galleryPath + gallery.Title + "/" + origImgDir)
-					check(err)
-					err = watcher.Add(galleryPath + gallery.Title + "/" + featImgDir)
-					check(err)
-					if gallery.Title != GlobConfig.Galleries[index].Title {
-						createGalleryHandle(gallery.Title)
+			for _, gallery := range newConfig.Galleries {
+				if gallery != GlobConfig.Galleries[gallery.Title] {
+					log.Print(gallery)
+					go func() {
+						time.Sleep(3 * time.Second)
+						err := watcher.Add(galleryPath + gallery.Title + "/" + origImgDir)
+						check(err)
+						time.Sleep(3 * time.Second)
+						err = watcher.Add(galleryPath + gallery.Title + "/" + featImgDir)
+						check(err)
+					}()
+					if GlobConfig.Galleries[gallery.Title] == nil || gallery.Title != GlobConfig.Galleries[gallery.Title].Title {
+						createGalleryHandle(newConfig, gallery.Title)
 					}
 					addZip(newConfig, gallery.Title)
 				}
