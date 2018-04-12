@@ -1,19 +1,19 @@
 package gollery
 
 import (
-	"io/ioutil"
-	"log"
-	"os"
-	"path/filepath"
-	"io"
-	"net/http"
 	"image"
 	_ "image/jpeg" //read jpeg files
 	_ "image/png"  //read png files
+	"io"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
-	"github.com/xor-gate/goexif2/exif"
 	"github.com/mholt/archiver"
+	"github.com/xor-gate/goexif2/exif"
 )
 
 // Returns the content of a directory on a filesystem.

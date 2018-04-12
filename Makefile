@@ -24,17 +24,12 @@ build:
 	@echo "Building..."
 	go-bindata-assetfs -pkg gollery -o assets.go web/...
 	go build -o $(GOLLERY_BINARY) cmd/gollery/main.go
+build-docker:
+	docker build --rm -t gollery:latest .
 run:
 	@echo "Running the server..."
 	./$(GOLLERY_BINARY)
 clean:
 	$(GOCLEAN)
 	rm -f $(GOLLERY_BINARY)
-#release: build
-#	@echo "Building docker image to cross-compile touchy..."
-#	docker build -t touchy .
-#	@echo "Removing previous builds..."
-#	rm -rf ./touchy_*
-#	@echo "Compiling touchy for multiple archs..."
-#	docker run -ti -v $$(pwd):/go/src/github.com/odino/touchy touchy
 dev: build-dev run

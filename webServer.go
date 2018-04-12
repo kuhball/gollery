@@ -1,13 +1,13 @@
 package gollery
 
 import (
+	"github.com/NYTimes/gziphandler"
+	bTemplate "github.com/arschles/go-bindata-html-template"
+	"log"
 	"net/http"
 	"os"
-	"log"
-	"strings"
 	"path/filepath"
-	bTemplate "github.com/arschles/go-bindata-html-template"
-	"github.com/NYTimes/gziphandler"
+	"strings"
 )
 
 var t *bTemplate.Template
@@ -47,7 +47,6 @@ func galleryHandler() http.HandlerFunc {
 
 // Handler for all the image files within the gallery root folder
 // Only displays files, no folders or config files
-// TODO: return a real HTTP 404 error in case of not found.
 func imageHandler(w http.ResponseWriter, r *http.Request) {
 	path := filepath.FromSlash(getDir() + r.URL.Path[len("/image"):])
 
