@@ -119,28 +119,29 @@ func filterFile(event fsnotify.Event) {
 }
 
 // Check whether magick or convert are available for exec & print version
-// TODO: improve this shit, quick hack, not a nice solution
 func checkImageTool() {
-	localCMD := exec.Command("convert", "-version")
-	_, err := localCMD.CombinedOutput()
+	path, err := exec.LookPath("convert")
 	if err != nil {
-		log.Print("convert is unavailable.")
+		log.Print("convert is not available.")
+	}
+	if strings.Contains(path, "system32") {
+		log.Print("convert is not available.")
 	} else {
-		fmt.Printf("using convert\n")
 		cmd = "convert"
+		log.Print("convert it is.")
 		return
 	}
 
-	localCMD = exec.Command("magick", "-version")
-	_, err = localCMD.CombinedOutput()
+	path, err = exec.LookPath("magick")
 	if err != nil {
-		log.Print("magick is unavaiable.")
+		log.Fatal("installing fortune is in your future")
 	} else {
-		fmt.Printf("using magick\n")
 		cmd = "magick"
+		log.Print("magick it is.")
 		return
 	}
-	log.Fatal("Magick and convert are not available. Please install one of them.")
+
+	log.Fatal("Convert and magick are not available, please fix that!")
 }
 
 // This function calls the cli tool magick / convert
