@@ -303,7 +303,6 @@ func removeGallery(path string) error {
 
 // CliAccess - Main function for all functionality
 // provides all cli arguments via cli plugin - read doc for more information
-//TODO: test custom directory option
 func CliAccess() {
 	var customDir string
 

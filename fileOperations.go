@@ -109,7 +109,7 @@ func addZip(c Config, gallery string) {
 		folders := []string{filepath.FromSlash(galleryPath + gallery + "/" + origImgDir), filepath.FromSlash(galleryPath + gallery + "/" + featImgDir)}
 		err := archiver.Zip.Make(filepath.FromSlash(galleryPath+gallery+"/"+gallery+"_images.zip"), folders)
 		check(err)
-		log.Print("New zip file created.")
+		log.Print("New zip file for " + gallery + " gallery created.")
 	} else {
 		if !checkFile(filepath.FromSlash(galleryPath + gallery + "/" + gallery + "_images.zip")) {
 			removeFile(filepath.FromSlash(galleryPath + gallery + "/" + gallery + "_images.zip"))
@@ -124,6 +124,8 @@ func createCustomCss(c Config, gallery string) {
 			check(err)
 			log.Print("Created new file " + gallery + "/custom_css.css .")
 			file.Close()
+		} else {
+			log.Print("Custom CSS file is already existing.")
 		}
 	} else {
 		if !checkFile(filepath.FromSlash(galleryPath + gallery + "/custom_css.css")) {
