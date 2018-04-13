@@ -28,6 +28,7 @@ func initTemplate() {
 	}
 }
 
+//TODO: debug on uberspace - not sure what the issue is
 func galleryHandler() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		title := strings.Replace(r.URL.Path, "/", "", 2)
@@ -39,9 +40,19 @@ func galleryHandler() http.HandlerFunc {
 			recreate = false
 		}
 
+		if pusher, ok := w.(http.Pusher); ok {
+			if err := pusher.Push("/static/css/custom.css", nil); err != nil {
+				log.Printf("Failed to push: %v", err)
+			}
+			if err := pusher.Push("/static/js/index.js", nil); err != nil {
+				log.Printf("Failed to push: %v", err)
+			}
+		}
+
 		var err error
 		err = t.Execute(w, GlobConfig.Galleries[title])
 		check(err)
+
 	})
 }
 
@@ -96,5 +107,15 @@ func initWebServer(port string) {
 		createGalleryHandle(GlobConfig, subSite)
 	}
 
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	if GlobConfig.SSL {
+		if checkFile(GlobConfig.Cert) {
+			log.Fatal("Cert file is not existing.")
+		}
+		if checkFile(GlobConfig.Key) {
+			log.Fatal("Key file is not existing.")
+		}
+		log.Fatal(http.ListenAndServeTLS(":"+port, GlobConfig.Cert, GlobConfig.Key, nil))
+	} else {
+		log.Fatal(http.ListenAndServe(":"+port, nil))
+	}
 }

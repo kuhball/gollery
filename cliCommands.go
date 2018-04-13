@@ -11,6 +11,7 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
+	"path/filepath"
 )
 
 // Function for creating a new root gallery folder
@@ -248,7 +249,7 @@ func startGollery(c *cli.Context, directory string) error {
 		galleryPath = getDir() + "/"
 		configPath = galleryPath + "/config.yaml"
 	} else {
-		galleryPath = directory + "/"
+		galleryPath = filepath.ToSlash(directory) + "/"
 		configPath = galleryPath + "/config.yaml"
 	}
 

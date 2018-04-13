@@ -26,6 +26,9 @@ var configPath string
 // Config Struct for the config.yaml with Port and all the galleries.
 type Config struct {
 	Port      string
+	SSL       bool
+	Cert      string
+	Key       string
 	Galleries map[string]*Gallery
 }
 
@@ -97,10 +100,10 @@ func ReadConfig(f string, initialize bool) Config {
 // Call returnImageData() for every image
 // Write image data into given config struct / gallery struct / image struct
 func initImages(c Config, gallery string) Config {
-	for _, orig := range readDir(gallery + "/" + origImgDir) {
+	for _, orig := range readDir(galleryPath + gallery + "/" + origImgDir) {
 		c = appendImage(c, gallery, orig.Name(), false)
 	}
-	for _, orig := range readDir(gallery + "/" + featImgDir) {
+	for _, orig := range readDir(galleryPath + gallery + "/" + featImgDir) {
 		c = appendImage(c, gallery, orig.Name(), true)
 	}
 	c = sortImages(c, gallery)
@@ -109,10 +112,10 @@ func initImages(c Config, gallery string) Config {
 
 func appendImage(c Config, gallery string, name string, feature bool) Config {
 	if feature {
-		date, tm, ratio := returnImageData(gallery + "/" + featImgDir + name)
+		date, tm, ratio := returnImageData(galleryPath + gallery + "/" + featImgDir + name)
 		c.Galleries[gallery].Images = append(c.Galleries[gallery].Images, Image{Name: name, Date: date, Time: tm, Feature: true, Ratio: ratio})
 	} else {
-		date, tm, ratio := returnImageData(gallery + "/" + origImgDir + name)
+		date, tm, ratio := returnImageData(galleryPath + gallery + "/" + origImgDir + name)
 		c.Galleries[gallery].Images = append(c.Galleries[gallery].Images, Image{Name: name, Date: date, Time: tm, Feature: false, Ratio: ratio})
 	}
 	return c
