@@ -48,7 +48,7 @@ func galleryHandler() http.HandlerFunc {
 // Handler for all the image files within the gallery root folder
 // Only displays files, no folders or config files
 func imageHandler(w http.ResponseWriter, r *http.Request) {
-	path := filepath.FromSlash(getDir() + r.URL.Path[len("/image"):])
+	path := filepath.FromSlash(galleryPath + r.URL.Path[len("/image"):])
 
 	if f, err := os.Stat(path); err == nil && !f.IsDir() && !strings.Contains(path, "config") {
 		http.ServeFile(w, r, path)

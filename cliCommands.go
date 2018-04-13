@@ -245,9 +245,11 @@ func startGollery(c *cli.Context, directory string) error {
 	}
 
 	if directory == "" {
-		configPath = getDir() + "/config.yaml"
+		galleryPath = getDir() + "/"
+		configPath = galleryPath + "/config.yaml"
 	} else {
-		configPath = directory + "/config.yaml"
+		galleryPath = directory + "/"
+		configPath = galleryPath + "/config.yaml"
 	}
 
 	GlobConfig = ReadConfig(configPath, true)
@@ -303,7 +305,6 @@ func removeGallery(path string) error {
 // provides all cli arguments via cli plugin - read doc for more information
 //TODO: test custom directory option
 func CliAccess() {
-	var directory string
 	var customDir string
 
 	app := cli.NewApp()
@@ -327,10 +328,9 @@ func CliAccess() {
 			Usage:       "Start gollery as a daemon",
 			Description: "moin",
 			Action: func(c *cli.Context) error {
-				return startGollery(c, directory)
+				return startGollery(c, customDir)
 			},
 			Flags: []cli.Flag{
-				cli.StringFlag{Name: "directory, d", Usage: "root path for gollery", Destination: &directory},
 				cli.BoolFlag{Name: "webserver, w", Usage: "only start webserver"},
 				cli.BoolFlag{Name: "filewatcher, f", Usage: "only start filewatcher"},
 			},
