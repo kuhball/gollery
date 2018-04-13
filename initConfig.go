@@ -34,6 +34,7 @@ type Gallery struct {
 	Title       string
 	Description string
 	Download    bool
+	CustomCss   bool
 	Images      []Image `yaml:"-"`
 	Dir         dir     `yaml:"-"`
 }

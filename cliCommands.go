@@ -17,6 +17,7 @@ import (
 // Creates a custom_css folder, the config.yaml with a example gallery and the corresponding file structure
 // TODO: import the custom_css files into html template
 func initGollery(path string) error {
+	//Define where the new gollery should be initialized
 	if path == "" {
 		pathSelect := promptui.Select{
 			Label: "You haven't specified a Path. Should the new Gollery be initialized at " + getDir() + "?",
@@ -66,13 +67,13 @@ func initGollery(path string) error {
 		}
 	}
 
-	if checkFile("custom_css") {
-		err := os.Mkdir(path+"/custom_css", 0600)
-		check(err)
-		log.Print("Created folder custom_css.")
-	} else {
-		log.Println("costum_css folder is already existing.")
-	}
+	//if checkFile("custom_css") {
+	//	err := os.Mkdir(path+"/custom_css", 0600)
+	//	check(err)
+	//	log.Print("Created folder custom_css.")
+	//} else {
+	//	log.Println("costum_css folder is already existing.")
+	//}
 
 	if !checkFile(path + "/config.yaml") {
 		overwriteConfig := promptui.Select{
@@ -119,7 +120,7 @@ func initGollery(path string) error {
 // Creates an example gallery configuration
 func initExampleConfig() Config {
 	g := make(map[string]*Gallery)
-	e := Gallery{Title: "example", Description: "This is an example gallery.", Download: false}
+	e := Gallery{Title: "example", Description: "This is an example gallery.", Download: false, CustomCss: false}
 	g["example"] = &e
 	c := Config{Port: "8080", Galleries: g}
 
@@ -216,20 +217,18 @@ func createGalleries(path string) {
 			err := os.Mkdir(path+"/"+subsite+"/featured", 0755)
 			check(err)
 			log.Print("Created new folder " + subsite + "/featured .")
-
 		}
 		if checkFile(path + "/" + subsite + "/preview") {
 			err := os.Mkdir(path+"/"+subsite+"/preview", 0755)
 			check(err)
 			log.Print("Created new folder " + subsite + "/preview .")
-
 		}
 		if checkFile(path + "/" + subsite + "/thumbnail") {
 			err := os.Mkdir(path+"/"+subsite+"/thumbnail", 0755)
 			check(err)
 			log.Print("Created new folder " + subsite + "/thumbnail .")
-
 		}
+		createCustomCss(c, subsite)
 	}
 }
 
@@ -265,6 +264,7 @@ func startGollery(c *cli.Context, directory string) error {
 
 // CliAccess - Main function for all functionality
 // provides all cli arguments via cli plugin - read doc for more information
+//TODO: Remove gallery from config file
 func CliAccess() {
 	var directory string
 	var customDir string

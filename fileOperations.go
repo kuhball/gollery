@@ -116,3 +116,18 @@ func addZip(c Config, gallery string) {
 		}
 	}
 }
+
+func createCustomCss(c Config, gallery string) {
+	if c.Galleries[gallery].CustomCss {
+		if checkFile(galleryPath + "/" + gallery + "/custom_css") {
+			file, err := os.Create(galleryPath + "/" + gallery + "/custom_css.css")
+			check(err)
+			log.Print("Created new file " + gallery + "/custom_css.css .")
+			file.Close()
+		}
+	} else {
+		if !checkFile(filepath.FromSlash(galleryPath + gallery + "/custom_css.css")) {
+			removeFile(filepath.FromSlash(galleryPath + gallery + "/custom_css.css"))
+		}
+	}
+}

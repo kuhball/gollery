@@ -61,6 +61,9 @@
     </div>
 </div>
 <script>var images = {{.Images}};</script>
+{{ if .CustomCss }}
+<link rel="stylesheet" href="/{{ $.Dir.GalleryPath }}{{ $.Title }}/custom_css.css">
+{{end}}
 <script async src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-lazyload/10.5.2/lazyload.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
@@ -73,7 +76,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chocolat/0.4.19/css/chocolat.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Merriweather+Sans:800|Roboto:100,300" >
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Merriweather+Sans:800|Roboto:100,300">
 <link rel="stylesheet" href="/static/css/custom.css">
 </body>
 

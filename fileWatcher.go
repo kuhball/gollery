@@ -86,7 +86,6 @@ func filterFile(event fsnotify.Event) {
 			newConfig := ReadConfig(configPath, true)
 			for _, gallery := range newConfig.Galleries {
 				if gallery != GlobConfig.Galleries[gallery.Title] {
-					log.Print(gallery)
 					go func() {
 						time.Sleep(3 * time.Second)
 						err := watcher.Add(galleryPath + gallery.Title + "/" + origImgDir)
@@ -99,6 +98,7 @@ func filterFile(event fsnotify.Event) {
 						createGalleryHandle(newConfig, gallery.Title)
 					}
 					addZip(newConfig, gallery.Title)
+					createCustomCss(newConfig, gallery.Title)
 				}
 				gallery.Dir = initDir()
 			}
