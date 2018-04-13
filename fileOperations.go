@@ -26,7 +26,7 @@ func readDir(dir string) []os.FileInfo {
 
 // Delete a file from a filesystem.
 func removeFile(input string) {
-	err := os.Remove(filepath.FromSlash(input))
+	err := os.RemoveAll(filepath.FromSlash(input))
 	check(err)
 
 	log.Println("File " + input + " successfull removed.")

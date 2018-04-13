@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 
+	"errors"
 	"github.com/manifoldco/promptui"
 	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
@@ -15,7 +16,6 @@ import (
 // Function for creating a new root gallery folder
 // Checks whether a custom path was specified and uses current path if not.
 // Creates a custom_css folder, the config.yaml with a example gallery and the corresponding file structure
-// TODO: import the custom_css files into html template
 func initGollery(path string) error {
 	//Define where the new gollery should be initialized
 	if path == "" {
@@ -23,8 +23,15 @@ func initGollery(path string) error {
 			Label: "You haven't specified a Path. Should the new Gollery be initialized at " + getDir() + "?",
 			Items: []string{"yep, go!", "nop!"},
 		}
+		pathValidate := func(input string) error {
+			if checkFile(input) {
+				return errors.New("provided path doesn't exist")
+			}
+			return nil
+		}
 		enterPath := promptui.Prompt{
-			Label: "Please enter a custom Path (full or starting at the current location)",
+			Label:    "Please enter a custom Path (full or starting at the current location)",
+			Validate: pathValidate,
 		}
 
 		if _, s, err := pathSelect.Run(); err != nil {
@@ -33,16 +40,10 @@ func initGollery(path string) error {
 		} else if s == "yep, go!" {
 			path = getDir()
 		} else if s == "nop!" {
-		checkPath:
 			var err error
 			if path, err = enterPath.Run(); err != nil {
 				fmt.Printf("Prompt failed %v\n", err)
 				return err
-			}
-
-			if checkFile(path) {
-				log.Println("The provided path doesn't exist. Please try again.")
-				goto checkPath
 			}
 		}
 	}
@@ -66,14 +67,6 @@ func initGollery(path string) error {
 			return nil
 		}
 	}
-
-	//if checkFile("custom_css") {
-	//	err := os.Mkdir(path+"/custom_css", 0600)
-	//	check(err)
-	//	log.Print("Created folder custom_css.")
-	//} else {
-	//	log.Println("costum_css folder is already existing.")
-	//}
 
 	if !checkFile(path + "/config.yaml") {
 		overwriteConfig := promptui.Select{
@@ -145,8 +138,19 @@ func newGallery(path string) error {
 
 	c := ReadConfig(path+"/config.yaml", false)
 
+	titleValidate := func(input string) error {
+		if len(input) < 1 {
+			return errors.New("title must have at least 1 character")
+		}
+		if c.Galleries[input] != nil {
+			return errors.New("gallery is already existing")
+		}
+		return nil
+	}
+
 	title := promptui.Prompt{
-		Label: "Title",
+		Label:    "Title",
+		Validate: titleValidate,
 	}
 
 	description := promptui.Prompt{
@@ -158,20 +162,14 @@ func newGallery(path string) error {
 		Items: []string{"yep, go!", "nop!"},
 	}
 
-newTitle:
+	customCss := promptui.Select{
+		Label: "Create a custom_css file for this gallery?",
+		Items: []string{"yep, go!", "nop!"},
+	}
+
 	if newData.Title, err = title.Run(); err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
 		return err
-	}
-
-	if len(newData.Title) < 1 {
-		log.Println("Title must have atleast 1 character, try again.")
-		goto newTitle
-	}
-
-	if c.Galleries[newData.Title] != nil {
-		log.Println("Gallery is already existing, try again.")
-		goto newTitle
 	}
 
 	if newData.Description, err = description.Run(); err != nil {
@@ -186,6 +184,15 @@ newTitle:
 		newData.Download = true
 	} else if s == "nop!" {
 		newData.Download = false
+	}
+
+	if _, s, err := customCss.Run(); err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return err
+	} else if s == "yep, go!" {
+		newData.CustomCss = true
+	} else if s == "nop!" {
+		newData.CustomCss = false
 	}
 
 	c.Galleries[newData.Title] = &newData
@@ -262,9 +269,39 @@ func startGollery(c *cli.Context, directory string) error {
 	return nil
 }
 
+func removeGallery(path string) error {
+	c := ReadConfig(path+"/config.yaml", false)
+
+	log.Print("Please provide the title of the gallery:")
+
+	validate := func(input string) error {
+		if c.Galleries[input] == nil {
+			return errors.New("gallery is not existing")
+		}
+		return nil
+	}
+
+	title := promptui.Prompt{
+		Label:    "Title",
+		Validate: validate,
+	}
+
+	result, err := title.Run()
+	check(err)
+
+	if !checkFile(path + "/" + result) {
+		removeFile(path + "/" + result)
+	}
+
+	delete(c.Galleries, result)
+	writeConfig(path, c)
+
+	return nil
+}
+
 // CliAccess - Main function for all functionality
 // provides all cli arguments via cli plugin - read doc for more information
-//TODO: Remove gallery from config file
+//TODO: test custom directory option
 func CliAccess() {
 	var directory string
 	var customDir string
@@ -272,7 +309,7 @@ func CliAccess() {
 	app := cli.NewApp()
 	app.Name = "gollery"
 	app.Version = "0.1.0"
-	app.Usage = "start, initialize and create new galleries in gollery"
+	app.Usage = "start, initialize, create and remove new galleries in gollery"
 	app.Authors = []cli.Author{
 		{
 			Name: "Simon Couball", Email: "info@simoncouball.de",
@@ -317,6 +354,18 @@ func CliAccess() {
 					return newGallery(getDir())
 				}
 				return newGallery(customDir)
+			},
+		},
+		{
+			Name:        "remove",
+			Aliases:     []string{"r"},
+			Usage:       "remove a gallery",
+			Description: "test",
+			Action: func(c *cli.Context) error {
+				if customDir == "" {
+					return removeGallery(getDir())
+				}
+				return removeGallery(customDir)
 			},
 		},
 	}

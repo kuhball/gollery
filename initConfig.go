@@ -71,7 +71,6 @@ func initDir() dir {
 // ReadConfig - Checks whether provided config path is valid
 // Read & unmarshal config.yaml
 // Call initImages for all galleries from the config file
-// TODO: add support for json config file
 func ReadConfig(f string, initialize bool) Config {
 	if checkFile(f) {
 		log.Fatal(f + ": Does not exist.")
