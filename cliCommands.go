@@ -325,7 +325,7 @@ func CliAccess() {
 		{
 			Name:        "start",
 			Aliases:     []string{"s"},
-			Usage:       "Start gollery as a daemon",
+			Usage:       "Start gollery",
 			Description: "moin",
 			Action: func(c *cli.Context) error {
 				return startGollery(c, customDir)

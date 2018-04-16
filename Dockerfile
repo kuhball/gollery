@@ -14,7 +14,6 @@ RUN make build
 FROM alpine
 WORKDIR /gollery
 COPY --from=build-env /go/bin/gollery /usr/bin/
-COPY --from=build-env /go/src/github.com/scouball/gollery/web /web/
 
 RUN apk --update add imagemagick
 

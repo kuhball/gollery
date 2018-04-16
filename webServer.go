@@ -40,14 +40,14 @@ func galleryHandler() http.HandlerFunc {
 			recreate = false
 		}
 
-		if pusher, ok := w.(http.Pusher); ok {
-			if err := pusher.Push("/static/css/custom.css", nil); err != nil {
-				log.Printf("Failed to push: %v", err)
-			}
-			if err := pusher.Push("/static/js/index.js", nil); err != nil {
-				log.Printf("Failed to push: %v", err)
-			}
-		}
+		//if pusher, ok := w.(http.Pusher); ok {
+		//	if err := pusher.Push("/static/css/custom.css", nil); err != nil {
+		//		log.Printf("Failed to push: %v", err)
+		//	}
+		//	if err := pusher.Push("/static/js/index.js", nil); err != nil {
+		//		log.Printf("Failed to push: %v", err)
+		//	}
+		//}
 
 		var err error
 		err = t.Execute(w, GlobConfig.Galleries[title])
@@ -106,7 +106,7 @@ func initWebServer(port string) {
 	for subSite := range GlobConfig.Galleries {
 		createGalleryHandle(GlobConfig, subSite)
 	}
-
+	log.Print("Starting webserver on Port " + port)
 	if GlobConfig.SSL {
 		if checkFile(GlobConfig.Cert) {
 			log.Fatal("Cert file is not existing.")
@@ -114,6 +114,7 @@ func initWebServer(port string) {
 		if checkFile(GlobConfig.Key) {
 			log.Fatal("Key file is not existing.")
 		}
+		log.Print("Starting TLS Webserver.")
 		log.Fatal(http.ListenAndServeTLS(":"+port, GlobConfig.Cert, GlobConfig.Key, nil))
 	} else {
 		log.Fatal(http.ListenAndServe(":"+port, nil))

@@ -10,18 +10,19 @@ import (
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
+	"runtime"
+	"sync"
 	"time"
 )
 
-// variable for image creation tool convert / magick
-var cmd string
-
-// used for zip recreation - changed by watcher event
-var recreate = false
-
-var watcher *fsnotify.Watcher
-
-var configWriteTime = time.Now()
+var (
+	cmd             string
+	recreate        = false
+	watcher         *fsnotify.Watcher
+	configWriteTime = time.Now()
+	wg              sync.WaitGroup
+	semaphore       = make(chan struct{}, runtime.NumCPU())
+)
 
 // initialize a new fsnotify watcher
 // watcher calls filterfile() in case of an event
@@ -37,7 +38,7 @@ func watchFile(galleries map[string]*Gallery) {
 		for {
 			select {
 			case event := <-watcher.Events:
-				filterFile(event)
+				go filterFile(event)
 			case err = <-watcher.Errors:
 				log.Println("error:", err)
 			}
@@ -71,15 +72,16 @@ func filterFile(event fsnotify.Event) {
 
 	if event.Op.String() == "CREATE" {
 		if imgKind == origImgDir {
+			wg.Add(1)
 			createImage(event.Name, galleryPath+gallery+thumbImgDir+"thumb"+filename, thumbSize)
-			GlobConfig = appendImage(GlobConfig, gallery[:len(gallery)-1], filename, false)
 		} else if imgKind == featImgDir {
+			wg.Add(1)
 			createImage(event.Name, galleryPath+gallery+thumbImgDir+"feat"+filename, featSize)
-			GlobConfig = appendImage(GlobConfig, gallery[:len(gallery)-1], filename, true)
 		}
-		go createImage(event.Name, galleryPath+gallery+prevImgDir+"prev"+filename, prevSize)
-		GlobConfig = sortImages(GlobConfig, gallery[:len(gallery)-1])
+		wg.Add(1)
+		createImage(event.Name, galleryPath+gallery+prevImgDir+"prev"+filename, prevSize)
 		recreate = true
+		wg.Wait()
 	} else if event.Op.String() == "WRITE" && filename == "config.yaml" {
 		if duration := time.Since(configWriteTime); duration.Seconds() > time.Second.Seconds()*3 {
 			log.Print("Reading changes from config.yaml.")
@@ -150,12 +152,19 @@ func checkImageTool() {
 // The input image is loaded and a new output image is created with a given size. An error is returned in case of a not valid image.
 // Magick options are adjusted for thumbnails.
 func createImage(input string, output string, size int) {
-	args := []string{input, "-define", "jpeg:size=" + strconv.Itoa(size*2) + "x", "-auto-orient", "-quality", "80", "-thumbnail", strconv.Itoa(size) + "x", "-unsharp", "0x.5", output}
-	if err := exec.Command(cmd, args...).Run(); err != nil {
-		fmt.Fprintln(os.Stderr, err, input)
-		os.Exit(1)
-	}
-	fmt.Println("Successfully created " + strconv.Itoa(size) + " - " + output)
+	go func() {
+		semaphore <- struct{}{} // Lock
+		defer func() {
+			<-semaphore // Unlock
+			wg.Done()
+		}()
+		args := []string{input, "-define", "jpeg:size=" + strconv.Itoa(size*2) + "x", "-auto-orient", "-quality", "80", "-thumbnail", strconv.Itoa(size) + "x", "-unsharp", "0x.5", output}
+		if err := exec.Command(cmd, args...).Run(); err != nil {
+			fmt.Fprintln(os.Stderr, err, input)
+			os.Exit(1)
+		}
+		fmt.Println("Successfully created " + strconv.Itoa(size) + " - " + output)
+	}()
 }
 
 // Calls checkFiles for every galleries orig and feat images
@@ -176,18 +185,23 @@ func checkSubSites(galleries map[string]*Gallery) {
 func checkFiles(files []os.FileInfo, gallery string, featured bool) {
 	for _, file := range files {
 		if checkFile(galleryPath+gallery+thumbImgDir+"thumb"+file.Name()) && !featured {
-			go createImage(galleryPath+gallery+origImgDir+file.Name(), galleryPath+gallery+thumbImgDir+"thumb"+file.Name(), thumbSize)
+			wg.Add(1)
+			createImage(galleryPath+gallery+origImgDir+file.Name(), galleryPath+gallery+thumbImgDir+"thumb"+file.Name(), thumbSize)
 		} else if checkFile(galleryPath+gallery+thumbImgDir+"feat"+file.Name()) && featured {
-			go createImage(galleryPath+gallery+featImgDir+file.Name(), galleryPath+gallery+thumbImgDir+"feat"+file.Name(), featSize)
+			wg.Add(1)
+			createImage(galleryPath+gallery+featImgDir+file.Name(), galleryPath+gallery+thumbImgDir+"feat"+file.Name(), featSize)
 		}
 		if checkFile(galleryPath + gallery + prevImgDir + "prev" + file.Name()) {
 			if featured {
-				go createImage(galleryPath+gallery+featImgDir+file.Name(), galleryPath+gallery+prevImgDir+"prev"+file.Name(), prevSize)
+				wg.Add(1)
+				createImage(galleryPath+gallery+featImgDir+file.Name(), galleryPath+gallery+prevImgDir+"prev"+file.Name(), prevSize)
 			} else {
-				go createImage(galleryPath+gallery+origImgDir+file.Name(), galleryPath+gallery+prevImgDir+"prev"+file.Name(), prevSize)
+				wg.Add(1)
+				createImage(galleryPath+gallery+origImgDir+file.Name(), galleryPath+gallery+prevImgDir+"prev"+file.Name(), prevSize)
 			}
 		}
 	}
+	wg.Wait()
 	if featured {
 		log.Print("Featured thumbnails and previews for " + gallery + " are available.")
 	} else {

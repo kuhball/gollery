@@ -58,6 +58,7 @@ func checkFile(path string) bool {
 func returnImageData(path string) (string, time.Time, float32) {
 	f, err := os.Open(filepath.FromSlash(path))
 	check(err)
+	defer f.Close()
 
 	size, _, err := image.DecodeConfig(f)
 	check(err)
@@ -88,6 +89,7 @@ func downloadFile(filepath string, url string) error {
 	defer out.Close()
 
 	// Get the data
+	log.Print("Downloading " + url + " - Please wait.")
 	resp, err := http.Get(url)
 	if err != nil {
 		return err

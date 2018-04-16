@@ -9,19 +9,22 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const origImgDir = "img/"
-const prevImgDir = "preview/"
-const featImgDir = "featured/"
-const thumbImgDir = "thumbnail/"
+const (
+	origImgDir  = "img/"
+	prevImgDir  = "preview/"
+	featImgDir  = "featured/"
+	thumbImgDir = "thumbnail/"
+	thumbSize   = 396
+	featSize    = 796
+	prevSize    = 1080
+)
 
-const thumbSize = 396
-const featSize = 796
-const prevSize = 1080
-
-// GlobConfig contains the read config from the config.yaml
-var GlobConfig Config
-var galleryPath = getDir() + "/"
-var configPath string
+var (
+	// GlobConfig contains the read config from the config.yaml
+	GlobConfig  Config
+	galleryPath = getDir() + "/"
+	configPath  string
+)
 
 // Config Struct for the config.yaml with Port and all the galleries.
 type Config struct {
@@ -122,14 +125,12 @@ func appendImage(c Config, gallery string, name string, feature bool) Config {
 }
 
 func deleteImage(c *Gallery, name string) *Gallery {
-	var i int
 	for p, v := range c.Images {
 		if v.Name == name {
-			i = p
+			c.Images = append(c.Images[:p], c.Images[p+1:]...)
 			break
 		}
 	}
-	c.Images = append(c.Images[:i], c.Images[i+1:]...)
 	return c
 }
 
