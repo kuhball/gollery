@@ -36,6 +36,7 @@ type Config struct {
 }
 
 // Gallery Struct for a gallery within the config struct.
+// Images and Dir are not in the config.yaml - recreated on every program start
 type Gallery struct {
 	Title       string
 	Description string
@@ -114,6 +115,8 @@ func initImages(c Config, gallery string) Config {
 	return c
 }
 
+// appends an image to the images slice within a gallery
+// reads the EXIF data from the image and writes that into the slice
 func appendImage(c Config, gallery string, name string, feature bool) Config {
 	if feature {
 		date, tm, ratio := returnImageData(galleryPath+gallery+"/"+featImgDir+name, c.Galleries[gallery].Sort)
@@ -125,6 +128,7 @@ func appendImage(c Config, gallery string, name string, feature bool) Config {
 	return c
 }
 
+// removes image from the images slice within a gallery
 func deleteImage(c *Gallery, name string) *Gallery {
 	for p, v := range c.Images {
 		if v.Name == name {
@@ -135,6 +139,7 @@ func deleteImage(c *Gallery, name string) *Gallery {
 	return c
 }
 
+// sorts the image slides within a gallery after the time the images where taken
 func sortImages(c Config, gallery string) Config {
 	sort.SliceStable(c.Galleries[gallery].Images, func(i, j int) bool {
 		return c.Galleries[gallery].Images[i].Time.Before(c.Galleries[gallery].Images[j].Time)

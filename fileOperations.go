@@ -121,6 +121,7 @@ func addZip(c Config, gallery string) {
 	}
 }
 
+// Creates / removes css file for gallery - bool within gallery struct is responsible
 func createCustomCss(c Config, gallery string) {
 	if c.Galleries[gallery].CustomCss {
 		if checkFile(galleryPath + "/" + gallery + "/custom_css") {
