@@ -41,6 +41,7 @@ type Gallery struct {
 	Description string
 	Download    bool
 	CustomCss   bool
+	Sort        bool
 	Images      []Image `yaml:"-"`
 	Dir         dir     `yaml:"-"`
 }
@@ -115,10 +116,10 @@ func initImages(c Config, gallery string) Config {
 
 func appendImage(c Config, gallery string, name string, feature bool) Config {
 	if feature {
-		date, tm, ratio := returnImageData(galleryPath + gallery + "/" + featImgDir + name)
+		date, tm, ratio := returnImageData(galleryPath+gallery+"/"+featImgDir+name, c.Galleries[gallery].Sort)
 		c.Galleries[gallery].Images = append(c.Galleries[gallery].Images, Image{Name: name, Date: date, Time: tm, Feature: true, Ratio: ratio})
 	} else {
-		date, tm, ratio := returnImageData(galleryPath + gallery + "/" + origImgDir + name)
+		date, tm, ratio := returnImageData(galleryPath+gallery+"/"+origImgDir+name, c.Galleries[gallery].Sort)
 		c.Galleries[gallery].Images = append(c.Galleries[gallery].Images, Image{Name: name, Date: date, Time: tm, Feature: false, Ratio: ratio})
 	}
 	return c

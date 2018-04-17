@@ -55,7 +55,7 @@ func checkFile(path string) bool {
 // This functions reads an image from a filesystem.
 // It decodes the image size and the taken time/date from the image.
 // Returns the Date as a string, the time object and the Image ratio (width/height).
-func returnImageData(path string) (string, time.Time, float32) {
+func returnImageData(path string, sort bool) (string, time.Time, float32) {
 	f, err := os.Open(filepath.FromSlash(path))
 	check(err)
 	defer f.Close()
@@ -63,15 +63,17 @@ func returnImageData(path string) (string, time.Time, float32) {
 	size, _, err := image.DecodeConfig(f)
 	check(err)
 
-	x, err := exif.Decode(f)
-	var tm time.Time
-	if err != nil {
-		log.Print("Not able to read exif Data of " + path + ", please check! (" + err.Error() + ")")
-		log.Print("Using current Date: " + time.Now().Format("Mon, 2 Jan 2006"))
-		tm = time.Now()
-	} else {
-		tm, err = x.DateTime()
-		check(err)
+	tm := time.Now()
+	if sort {
+		x, err := exif.Decode(f)
+		if err != nil {
+			log.Print("Not able to read exif Data of " + path + ", please check! (" + err.Error() + ")")
+			log.Print("Using current Date: " + time.Now().Format("Mon, 2 Jan 2006"))
+			tm = time.Now()
+		} else {
+			tm, err = x.DateTime()
+			check(err)
+		}
 	}
 
 	return tm.Format("Mon, 2 Jan 2006"), tm, float32(size.Width) / float32(size.Height)

@@ -13,7 +13,3 @@
 
 # goland stuff
 .idea/
-
-# image stuff
-gallery/
-config/

@@ -21,7 +21,7 @@ func initGollery(path string) error {
 	//Define where the new gollery should be initialized
 	if path == "" {
 		pathSelect := promptui.Select{
-			Label: "You haven't specified a Path. Should the new Gollery be initialized at " + getDir() + "?",
+			Label: "You haven't specified a Path. Should the new gollery be initialized at " + getDir() + "?",
 			Items: []string{"yep, go!", "nop!"},
 		}
 		pathValidate := func(input string) error {
