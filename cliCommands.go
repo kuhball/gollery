@@ -21,7 +21,7 @@ func initGollery(path string) error {
 	//Define where the new gollery should be initialized
 	if path == "" {
 		pathSelect := promptui.Select{
-			Label: "You haven't specified a Path. Should the new Gollery be initialized at " + getDir() + "?",
+			Label: "You haven't specified a Path. Should the new gollery be initialized at " + getDir() + "?",
 			Items: []string{"yep, go!", "nop!"},
 		}
 		pathValidate := func(input string) error {
@@ -168,6 +168,11 @@ func newGallery(path string) error {
 		Items: []string{"yep, go!", "nop!"},
 	}
 
+	sort := promptui.Select{
+		Label: "Should the gallery be sorted after creation date of the images? (EXIF Data is necessary.)",
+		Items: []string{"yep, go!", "nop!"},
+	}
+
 	if newData.Title, err = title.Run(); err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
 		return err
@@ -194,6 +199,15 @@ func newGallery(path string) error {
 		newData.CustomCss = true
 	} else if s == "nop!" {
 		newData.CustomCss = false
+	}
+
+	if _, s, err := sort.Run(); err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return err
+	} else if s == "yep, go!" {
+		newData.Sort = true
+	} else if s == "nop!" {
+		newData.Sort = false
 	}
 
 	c.Galleries[newData.Title] = &newData
