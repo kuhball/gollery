@@ -61,14 +61,13 @@ func watchFile(galleries map[string]*Gallery) {
 // In case of a "CREATE" operation preview and thumbnail images are created with different sizes for feat and orig.
 // In case of a "REMOVE" operation preview and thumbnail images are removed from the filesystem
 func filterFile(event fsnotify.Event) {
-	filenameReplace, _ := regexp.Compile(`(\w:)*(\w*\\)`)
+	filenameReplace, _ := regexp.Compile(`(\w:)*(\w*\\)|(/.*/)`)
 	filename := filenameReplace.ReplaceAllString(event.Name, "")
 
 	galleryReplace, _ := regexp.Compile(`(\w*)`)
 	gallery := galleryReplace.FindString(event.Name[len(galleryPath):]) + "/"
 
-	imgKindReplace, _ := regexp.Compile(`(\w*)`)
-	imgKind := imgKindReplace.FindString(event.Name[len(galleryPath+gallery):]) + "/"
+	imgKind := galleryReplace.FindString(event.Name[len(galleryPath+gallery):]) + "/"
 
 	if event.Op.String() == "CREATE" {
 		if imgKind == origImgDir {
@@ -109,7 +108,7 @@ func filterFile(event fsnotify.Event) {
 			GlobConfig = newConfig
 			configWriteTime = time.Now()
 		}
-	} else if event.Op.String() == "REMOVE" {
+	} else if event.Op.String() == "REMOVE" || event.Op.String() == "RENAME" {
 		log.Print("Removing Image " + filename)
 		removeFile(galleryPath + gallery + prevImgDir + "prev" + filename)
 		if imgKind == origImgDir {

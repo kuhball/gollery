@@ -25,7 +25,7 @@ For creating thumbnails & previews gollery uses imagemagick. Please install a su
 1. clone the github repo
 2. `make install`
 3. `make build`
-4. there shout be a application in your go path called **gollery**
+4. there should be a application in your $GOPATH/bin called **gollery**
 
 ### Download binaries
 

@@ -263,8 +263,8 @@ func startGollery(c *cli.Context, directory string) error {
 		galleryPath = getDir() + "/"
 		configPath = galleryPath + "/config.yaml"
 	} else {
-		galleryPath = filepath.ToSlash(directory) + "/"
-		configPath = galleryPath + "/config.yaml"
+		galleryPath = filepath.Clean(filepath.ToSlash(directory)) + "/"
+		configPath = galleryPath + "config.yaml"
 	}
 
 	GlobConfig = ReadConfig(configPath, true)
