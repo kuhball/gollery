@@ -340,7 +340,7 @@ func CliAccess() {
 			Name:        "start",
 			Aliases:     []string{"s"},
 			Usage:       "Start gollery",
-			Description: "moin",
+			Description: "Starts gollery in the current cli",
 			Action: func(c *cli.Context) error {
 				return startGollery(c, customDir)
 			},
@@ -353,7 +353,7 @@ func CliAccess() {
 			Name:        "init",
 			Aliases:     []string{"i"},
 			Usage:       "init new root directory",
-			Description: "test",
+			Description: "Creates a new gollery with a config.yaml and an example gallery.",
 			Action: func(c *cli.Context) error {
 				return initGollery(customDir)
 			},
@@ -362,7 +362,7 @@ func CliAccess() {
 			Name:        "new",
 			Aliases:     []string{"n"},
 			Usage:       "create new gallery",
-			Description: "test",
+			Description: "Creates a new gallery within an existing config.yaml and adds the necessary folders.",
 			Action: func(c *cli.Context) error {
 				if customDir == "" {
 					return newGallery(getDir())
@@ -374,7 +374,7 @@ func CliAccess() {
 			Name:        "remove",
 			Aliases:     []string{"r"},
 			Usage:       "remove a gallery",
-			Description: "test",
+			Description: "Removes a gallery from an existing config.yaml and deletes all the files. ",
 			Action: func(c *cli.Context) error {
 				if customDir == "" {
 					return removeGallery(getDir())
