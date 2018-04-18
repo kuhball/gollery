@@ -45,6 +45,15 @@
 /*</editor-fold>*/
 
 /*region style classes*/
+a {
+    text-decoration: none;
+    color: black;
+}
+
+a:visited {
+    color: black;
+}
+
 h1 {
     font-family: 'Merriweather Sans', sans-serif;
     text-transform: uppercase;
