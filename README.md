@@ -7,14 +7,17 @@ A simple web gallery written in [golang](https://golang.org/) for serving images
 - watch image folders and create images automatically
 - serve a site for every gallery 
 - responsive masonry layout
+- create zip with all images
+- custom css for every gallery
 
-// here could be a demo image
+![alt text](screenshots/example_gollery.png "example gollery")
 
 ## Installation
 
 1. clone the github repo
-2. `make build`
-3. there shout be a application in your go path called **gollery**
+2. `make install`
+3. `make build`
+4. there shout be a application in your go path called **gollery**
 
 // Provide binarys for linux & windows in the future
 
