@@ -10,9 +10,10 @@ GOLLERY_BINARY ?= $(GOPATH)/bin/gollery$(IS_EXE)
 all: install build run
 install:
 	@echo "Installing go packages...(this will take a while)"
-	dep ensure
+	go get -u github.com/golang/dep/cmd/dep
 	go get -u github.com/go-bindata/go-bindata/...
 	go get -u github.com/elazarl/go-bindata-assetfs/...
+	dep ensure
 
 build:
 	@echo "Building..."
