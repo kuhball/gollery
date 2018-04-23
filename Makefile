@@ -76,7 +76,7 @@ release: cmd/gollery/main.go VERSION.txt ## Builds the cross-compiled binaries, 
 .PHONY: run
 run:
 	@echo "Running the server..."
-	./$(GOLLERY_BINARY) start
+	$(GOLLERY_BINARY) start
 
 .PHONY: clean
 clean:
