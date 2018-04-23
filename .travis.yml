@@ -1,0 +1,49 @@
+language: go
+sudo: false
+notifications:
+  email: true
+go:
+- 1.x
+install:
+- make install
+script:
+- make all
+- make release
+deploy:
+  provider: releases
+  api_key:
+    secure: gVKh7vcjplkKPAcmgs3VUrw/a8FQnwX94I0oDdHOxnr31ES6D+526oM/nHzvxFiyXEkZO50qMp8JFtDhrAoQLAoC/fbChAW6imXjsDt42vmBLO8g/JEl+MxE5y/cdVNkQFDkDnDg/9GmI+gdvqhzkrsOx4aOAKm9v+9FpXGv2luz3pK0m1zAJ6GkUPBQy8YXv4zjovnqJPDnhWhT2K9SXK5o5H9tzpqGIl1+QKhY0gu6yrMkg2Dj9lQqDuBw/KhIZg50FMkI63AIHPKVKYePNKP04cH4VYc+B07CHRHNN2/U2LLufO1AvsE/AtJDZ1YZSsod+QGgZ7/etuW91Pfeo3Xk/7NygIO7Rnd+rqAgxCyVELVzvpNcubRelLeJ/DzZWPGigDrPLSYubOi0BVC2vaGD+PdEfGhzTfCNUp2c5IYUruTvE6zRt9e4frVQ0uQhzIjIy1DUJXbX2IS9/PrGj7FZd7i4uNLDpD99boIeV6xsWWex3kY7dwmud2ngIzz+YtEzknSW5CEyORqKLxvtxkqjFDOPegE9GjURiiJvTtHl47Ien+8AJtgDFKam0UgdyCxOcghZFamFh607FyEHJMSfg8y0Xi5e0j2+/l0a0yY/uiknis10IygArNJ9FIr5qyMy9B0P4Kkb8fYv+oaNUQ+hIySpdVj2s2trUDW8+co=
+  file:
+        - cross/gollery-linux-amd64.md5
+        - cross/gollery-windows-386.sha256
+        - cross/gollery-linux-arm
+        - cross/gollery-darwin-amd64.md5
+        - cross/gollery-darwin-amd64
+        - cross/gollery-linux-arm64.sha256
+        - cross/gollery-linux-arm.sha256
+        - cross/gollery-linux-386.sha256
+        - cross/gollery-darwin-386.md5
+        - cross/gollery-windows-386.md5
+        - cross/gollery-freebsd-amd64.md5
+        - cross/gollery-linux-arm64.md5
+        - cross/gollery-linux-arm64
+        - cross/gollery-freebsd-amd64.sha256
+        - cross/gollery-freebsd-386.md5
+        - cross/gollery-linux-amd64.sha256
+        - cross/gollery-linux-386.md5
+        - cross/gollery-freebsd-386
+        - cross/gollery-windows-amd64
+        - cross/gollery-windows-amd64.md5
+        - cross/gollery-windows-amd64.sha256
+        - cross/gollery-linux-arm.md5
+        - cross/gollery-darwin-386.sha256
+        - cross/gollery-darwin-amd64.sha256
+        - cross/gollery-windows-386
+        - cross/gollery-darwin-386
+        - cross/gollery-linux-386
+        - cross/gollery-freebsd-amd64
+        - cross/gollery-freebsd-386.sha256
+        - cross/gollery-linux-amd64
+  skip_cleanup: true
+  on:
+    repo: scouball/gollery
