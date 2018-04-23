@@ -57,4 +57,7 @@ Check the help for further options.
 
 ### Docker
 
-There's the possibility to build gollery within a docker container. *Needs still some work.*
+There's the possibility to build gollery within a docker container. At the moment you still need to create a config with the binary or by hand outside the container.
+
+`make build-docker`
+`docker run -p 8080:8080 -v /PATH/TO/GALLERY/FOLDER:/gollery --name gollery gollery `

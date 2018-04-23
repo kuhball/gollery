@@ -2,7 +2,6 @@
 FROM golang:alpine as build-env
 
 RUN apk --update add make curl git
-RUN curl -fsSL -o /usr/local/bin/dep https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 && chmod +x /usr/local/bin/dep
 
 COPY ./ /go/src/github.com/scouball/gollery
 WORKDIR /go/src/github.com/scouball/gollery
