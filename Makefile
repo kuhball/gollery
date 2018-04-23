@@ -24,7 +24,7 @@ BUILDDIR := ${PREFIX}/cross
 GOOSARCHES = darwin/amd64 darwin/386 freebsd/amd64 freebsd/386 linux/arm linux/arm64 linux/amd64 linux/386 windows/amd64 windows/386
 
 .PHONY: all
- all: install build run
+ all: install build
 
 .PHONY: install
 install:
@@ -76,7 +76,7 @@ release: cmd/gollery/main.go VERSION.txt ## Builds the cross-compiled binaries, 
 .PHONY: run
 run:
 	@echo "Running the server..."
-	./$(GOLLERY_BINARY) start
+	$(GOLLERY_BINARY) start
 
 .PHONY: clean
 clean:
