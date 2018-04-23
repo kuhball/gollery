@@ -29,7 +29,7 @@ For creating thumbnails & previews gollery uses imagemagick. Please install a su
 
 ### Download binaries
 
-// Provide binaries for linux & windows in the future
+Download the latest [release](https://github.com/scouball/gollery/releases).
 
 ## Usage
 
