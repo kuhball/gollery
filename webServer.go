@@ -100,7 +100,7 @@ func initWebServer(port string) {
 	go initTemplate()
 
 	fs := justFilesFilesystem{assetFS()}
-	http.Handle("/static/", http.FileServer(fs))
+	http.Handle("/", http.FileServer(fs))
 	http.HandleFunc("/image/", imageHandler)
 
 	for subSite := range GlobConfig.Galleries {

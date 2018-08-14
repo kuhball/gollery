@@ -2,17 +2,19 @@
 # TODO: this is a fucking mess - clean this up
 
 GOOS ?= $(shell go env GOOS)
+SHOW := cat
 
 ifeq ($(GOOS),windows)
     IS_EXE := .exe
+    SHOW = type
 endif
 
-VERSION := $(shell cat VERSION.txt)
+VERSION := $(shell $(SHOW) VERSION.txt)
 
 GOLLERY_BINARY ?= $(GOPATH)/bin/gollery$(IS_EXE)
 
 # Set an output prefix, which is the local directory if not specified
-PREFIX?=$(shell pwd)
+PREFIX:=${CURDIR}
 
 # Setup name variables for the package/tool
 NAME := gollery
@@ -37,6 +39,12 @@ install:
 .PHONY: build
 build:
 	@echo "Building..."
+	go-bindata-assetfs -pkg gollery -o assets.go -ignore=robots.txt web/...
+	go build -o $(GOLLERY_BINARY) cmd/gollery/main.go
+
+.PHONY: build-robots
+build-robots:
+	@echo "Building with robots.txt..."
 	go-bindata-assetfs -pkg gollery -o assets.go web/...
 	go build -o $(GOLLERY_BINARY) cmd/gollery/main.go
 
