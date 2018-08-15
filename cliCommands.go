@@ -123,6 +123,15 @@ func initExampleConfig() Config {
 
 // Write a new config to the filesystem.
 func writeConfig(path string, c Config) {
+	for _, gallery := range c.Galleries {
+		if gallery.Link == "" {
+			gallery.Link = getCrypto(32)
+		}
+		if gallery.Password == "" {
+			gallery.Password = getCrypto(16)
+		}
+		log.Print("Gallery " + gallery.Title + " is reachable via http://localhost:" + c.Port + "/" + gallery.Link + " - gollery/" + gallery.Password)
+	}
 	d, err := yaml.Marshal(&c)
 	check(err)
 
@@ -158,6 +167,10 @@ func newGallery(path string) error {
 		Label: "Description",
 	}
 
+	password := promptui.Prompt{
+		Label: "Password (if empty password will be generated)",
+	}
+
 	download := promptui.Select{
 		Label: "Compress all images automatically and provide a download button?",
 		Items: []string{"yep, go!", "nop!"},
@@ -179,6 +192,11 @@ func newGallery(path string) error {
 	}
 
 	if newData.Description, err = description.Run(); err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return err
+	}
+
+	if newData.Password, err = password.Run(); err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
 		return err
 	}

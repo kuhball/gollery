@@ -96,7 +96,7 @@ func filterFile(event fsnotify.Event) {
 						check(err)
 					}()
 					if GlobConfig.Galleries[key] == nil || gallery.Title != GlobConfig.Galleries[key].Title {
-						createGalleryHandle(newConfig, gallery.Title)
+						createGalleryHandle(*gallery)
 					}
 					if GlobConfig.Galleries[key] != nil && gallery.Download != GlobConfig.Galleries[key].Download {
 						addZip(newConfig, key)

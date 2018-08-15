@@ -40,6 +40,8 @@ type Config struct {
 type Gallery struct {
 	Title       string
 	Description string
+	Link        string
+	Password    string
 	Download    bool
 	CustomCss   bool
 	Sort        bool

@@ -1,8 +1,10 @@
 package gollery
 
 import (
+	"crypto/subtle"
 	"github.com/NYTimes/gziphandler"
 	bTemplate "github.com/arschles/go-bindata-html-template"
+	"github.com/sethvargo/go-password/password"
 	"log"
 	"net/http"
 	"os"
@@ -14,6 +16,16 @@ var t *bTemplate.Template
 
 type justFilesFilesystem struct {
 	Fs http.FileSystem
+}
+
+// Generates Randomness for URL and Passwords
+func getCrypto(len int) string {
+	res, err := password.Generate(len, 10, 0, false, false)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf(res)
+	return res
 }
 
 // Read the html template from file into global variable and add a minus function.
@@ -29,9 +41,16 @@ func initTemplate() {
 }
 
 //TODO: debug on uberspace - not sure what the issue is
-func galleryHandler() http.HandlerFunc {
+func galleryHandler(title, username, password, realm string) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		title := strings.Replace(r.URL.Path, "/", "", 2)
+		user, pass, ok := r.BasicAuth()
+
+		if !ok || subtle.ConstantTimeCompare([]byte(user), []byte(username)) != 1 || subtle.ConstantTimeCompare([]byte(pass), []byte(password)) != 1 {
+			w.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
+			w.WriteHeader(401)
+			w.Write([]byte("Unauthorised.\n"))
+			return
+		}
 
 		if recreate {
 			addZip(GlobConfig, title)
@@ -86,9 +105,8 @@ func (fs justFilesFilesystem) Open(name string) (http.File, error) {
 	return f, nil
 }
 
-func createGalleryHandle(c Config, subSite string) {
-	c.Galleries[subSite].Dir = initDir()
-	http.Handle("/"+subSite, gziphandler.GzipHandler(galleryHandler()))
+func createGalleryHandle(subSite Gallery) {
+	http.Handle("/"+subSite.Link, gziphandler.GzipHandler(galleryHandler(subSite.Title, "gollery", subSite.Password, "Please Login.")))
 }
 
 // Initializes the HTML template
@@ -103,8 +121,9 @@ func initWebServer(port string) {
 	http.Handle("/", http.FileServer(fs))
 	http.HandleFunc("/image/", imageHandler)
 
-	for subSite := range GlobConfig.Galleries {
-		createGalleryHandle(GlobConfig, subSite)
+	for _, subSite := range GlobConfig.Galleries {
+		subSite.Dir = initDir()
+		createGalleryHandle(*subSite)
 	}
 	log.Print("Starting webserver on Port " + port)
 	if GlobConfig.SSL {
