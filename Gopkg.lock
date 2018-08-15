@@ -19,11 +19,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:35079f2cb6f8db82741f69e2bba9bc7abaeec1137b524b5c4b29509aadf965eb"
+  digest = "1:454adc7f974228ff789428b6dc098638c57a64aa0718f0bd61e53d3cd39d7a75"
   name = "github.com/chzyer/readline"
   packages = ["."]
   pruneopts = "UT"
-  revision = "f6d7a1f6fbf35bbf9beb80dc63c56a29dcfb759f"
+  revision = "2972be24d48e78746da79ba8e24e8b488c9880de"
 
 [[projects]]
   branch = "master"
@@ -39,6 +39,14 @@
   ]
   pruneopts = "UT"
   revision = "cc9eb1d7ad760af14e8f918698f745e80377af4f"
+
+[[projects]]
+  digest = "1:f4f6279cb37479954644babd8f8ef00584ff9fa63555d2c6718c1c3517170202"
+  name = "github.com/elazarl/go-bindata-assetfs"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "30f82fa23fd844bd5bb1e5f216db87fd77b5eb43"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:abeb38ade3f32a92943e5be54f55ed6d6e3b6602761d74b4aab4c9dd45c18abd"
@@ -61,15 +69,15 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:586d64cc78241ec7896fd170256b1d1f98bfd16757fce222927fd928431461a1"
+  digest = "1:bb08c7bb1c7224636b1a00639f079ed4391eb822945f26db74b8d8ee3f14d991"
   name = "github.com/lunixbochs/vtclean"
   packages = ["."]
   pruneopts = "UT"
-  revision = "d14193dfc626125c831501c1c42340b4248e1f5a"
+  revision = "2d01aacdc34a083dca635ba869909f5fc0cd4f41"
 
 [[projects]]
   branch = "master"
-  digest = "1:7f7799cc0ef4fe591dbd165e2d0920d2061e8490e0bc1ea7c797739367b4a2d5"
+  digest = "1:2d2bc0f23cca6b59cec3fbece9abc102bdb19f548dd58d7667e57699074a2c76"
   name = "github.com/manifoldco/promptui"
   packages = [
     ".",
@@ -77,7 +85,7 @@
     "screenbuf",
   ]
   pruneopts = "UT"
-  revision = "c0c0d3afc6a03bcb5c1df10b70b862a650db9f9b"
+  revision = "157c96fb638a14d268b305cf2012582431fcc410"
 
 [[projects]]
   digest = "1:c658e84ad3916da105a761660dcaeb01e63416c8ec7bc62256a9b411a05fcd67"
@@ -110,6 +118,14 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "e06696f847aeda6f39a8f0b7cdff193b7690aef6"
+
+[[projects]]
+  digest = "1:74e1e426348ad9d0165bf106ab29a0dc98c74c05998d36160003332579c66a87"
+  name = "github.com/sethvargo/go-password"
+  packages = ["password"]
+  pruneopts = "UT"
+  revision = "d207206009266fab3e355f1a0488b47ac24139c7"
+  version = "v0.1.1"
 
 [[projects]]
   digest = "1:4aeb3860275fa1fd60cccfb5a6ef85da438bf17402e1e84412ade4d4b55066a0"
@@ -145,11 +161,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:99e9f259afc6328efa223a59cdcfac9f974a9708c5dc1512948c995069ed1a5b"
+  digest = "1:0316a8ad208917f1d141b077e278980fd5e4594f3a85f835dacbf24d85798252"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "378d26f46672a356c46195c28f61bdb4c0a781dd"
+  revision = "4e1fef5609515ec7a2cee7b5de30ba6d9b438cbf"
 
 [[projects]]
   digest = "1:342378ac4dcb378a5448dd723f0784ae519383532f5e70ade24132c4c8693202"
@@ -165,9 +181,11 @@
   input-imports = [
     "github.com/NYTimes/gziphandler",
     "github.com/arschles/go-bindata-html-template",
+    "github.com/elazarl/go-bindata-assetfs",
     "github.com/fsnotify/fsnotify",
     "github.com/manifoldco/promptui",
     "github.com/mholt/archiver",
+    "github.com/sethvargo/go-password/password",
     "github.com/urfave/cli",
     "github.com/xor-gate/goexif2/exif",
     "gopkg.in/yaml.v2",
