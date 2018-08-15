@@ -32,6 +32,7 @@ type Config struct {
 	SSL       bool
 	Cert      string
 	Key       string
+	Auth      bool
 	Galleries map[string]*Gallery
 }
 

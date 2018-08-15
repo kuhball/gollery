@@ -116,7 +116,7 @@ func initExampleConfig() Config {
 	g := make(map[string]*Gallery)
 	e := Gallery{Title: "example", Description: "This is an example gallery.", Download: false, CustomCss: false}
 	g["example"] = &e
-	c := Config{Port: "8080", Galleries: g}
+	c := Config{Port: "8080", Galleries: g, Auth: true}
 
 	return c
 }
