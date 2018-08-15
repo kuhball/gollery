@@ -26,18 +26,20 @@
             </div>
 
         {{ range $key,$image := .Images }}
-        {{if ( or (eq $key 0) )}}
-            <div class="grid-item date">
-                <h4>{{$image.Date}}</h4>
-            </div>
-        {{end}}
-        {{if ( and (ne $key 0))}}
-        {{ if ne ($image.Date) (index $.Images (minus $key 1)).Date}}
-            <div class="grid-item date">
-                <hr>
-                <h4>{{$image.Date}}</h4>
-            </div>
-        {{end }}
+        {{if $.Sort}}
+            {{if ( or (eq $key 0) )}}
+                <div class="grid-item date">
+                    <h4>{{$image.Date}}</h4>
+                </div>
+            {{end}}
+            {{if ( and (ne $key 0))}}
+                {{if ne ($image.Date) (index $.Images (minus $key 1)).Date}}
+                    <div class="grid-item date">
+                        <hr>
+                        <h4>{{$image.Date}}</h4>
+                    </div>
+                {{end}}
+            {{end}}
         {{end}}
             <div class='grid-item {{ if $image.Feature }}feature{{end}}' name="{{$image.Name}}">
                 <a class='chocolat-image'
